@@ -41,8 +41,12 @@
   --soft-pink: #f6d7ee;
   --accent: #2f6f73;
   --accent-strong: #1f5458;
+  --success: #2d7b4f;
+  --success-bg: #e4f2e7;
   --danger: #a64242;
+  --danger-bg: #f8dddd;
   --warn: #936f18;
+  --warn-bg: #fff0c7;
   --shadow: 0 10px 24px rgba(31, 35, 40, 0.08);
 }
 
@@ -65,6 +69,7 @@ select {
 }
 
 .link-button {
+  display: inline;
   border: 0;
   padding: 0;
   background: transparent;
@@ -78,6 +83,10 @@ select {
 }
 
 button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: 1px solid #b8c2cc;
   background: #fff;
   color: var(--ink);
@@ -86,9 +95,26 @@ button {
   cursor: pointer;
 }
 
+.icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent-strong);
+}
+
+button.link-button {
+  display: inline;
+  justify-content: flex-start;
+  gap: 0;
 }
 
 button:disabled {
@@ -136,6 +162,7 @@ select {
 
 .rightbar {
   border-left: 1px solid var(--line);
+  background: #f2eee3;
 }
 
 .workbench {
@@ -228,6 +255,14 @@ select {
 .panel {
   padding: 16px;
   margin-bottom: 14px;
+}
+
+.panel-kicker {
+  margin: 0 0 3px;
+  color: #7a6a52;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .screen-head {
@@ -476,22 +511,58 @@ select {
   overflow: auto;
 }
 
+.notebook-panel {
+  position: sticky;
+  top: 18px;
+  background:
+    linear-gradient(#fffdf7, #fffdf7) padding-box,
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 30px,
+      rgba(161, 143, 110, 0.16) 31px
+    );
+  border-color: #c9bea8;
+  box-shadow: 0 8px 18px rgba(90, 79, 60, 0.08);
+}
+
+.notebook-panel h3 {
+  border-bottom: 1px solid #d9cfbd;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.notebook-panel .log-list {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0) 29px,
+      rgba(169, 150, 116, 0.16) 30px
+    );
+  padding-right: 4px;
+}
+
 .log-item {
   border-left: 3px solid var(--line);
-  padding: 8px 0 8px 10px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 8px 8px 8px 10px;
   color: #2d333a;
 }
 
 .log-item.good {
-  border-color: #4d8a50;
+  border-color: var(--success);
+  background: var(--success-bg);
 }
 
 .log-item.bad {
   border-color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .log-item.warn {
   border-color: var(--warn);
+  background: var(--warn-bg);
 }
 
 .central-log {
@@ -510,15 +581,18 @@ select {
 }
 
 .central-log-item.good {
-  border-color: #4d8a50;
+  border-color: var(--success);
+  background: var(--success-bg);
 }
 
 .central-log-item.bad {
   border-color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .central-log-item.warn {
   border-color: var(--warn);
+  background: var(--warn-bg);
 }
 
 .empty {
@@ -564,6 +638,10 @@ select {
   border-radius: 8px;
   box-shadow: 0 24px 70px rgba(31, 35, 40, 0.28);
   padding: 22px;
+}
+
+.email-modal {
+  border-top: 5px solid var(--accent);
 }
 
 .menu-modal {
@@ -640,6 +718,8 @@ select {
 }
 
 .cv-document {
+  max-width: 760px;
+  margin: 0 auto;
   background: #fff;
   color: #111;
   border: 1px solid #d7d0c2;
@@ -659,7 +739,7 @@ select {
   margin: 0;
   font-size: 28px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .cv-header p {
@@ -675,13 +755,17 @@ select {
   border-bottom: 1px solid #999;
   font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
 }
 
 .cv-document ol,
 .cv-document ul {
   margin: 8px 0 0 22px;
   padding: 0;
+}
+
+.cv-document li {
+  margin-bottom: 7px;
 }
 
 .cv-title {
@@ -694,6 +778,7 @@ select {
   color: #666;
   font-size: 13px;
   margin: 2px 0 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .scholar-metrics {
@@ -720,13 +805,23 @@ select {
 }
 
 .citation-histogram {
+  position: relative;
   display: flex;
   align-items: end;
   gap: 4px;
   min-height: 150px;
   border-left: 1px solid #999;
   border-bottom: 1px solid #999;
-  padding: 8px 4px 0;
+  padding: 22px 4px 0;
+}
+
+.citation-histogram::before {
+  content: "Citations by academic year";
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #555;
+  font-size: 12px;
 }
 
 .citation-bar {
@@ -742,7 +837,7 @@ select {
 
 .citation-bar-fill {
   width: 100%;
-  background: #5a7d9a;
+  background: var(--accent);
 }
 
 .ranking-list {
@@ -824,6 +919,38 @@ select {
   border-radius: 8px;
   background: #fff;
   padding: 14px;
+}
+
+.annual-report {
+  background: #fffdf7;
+  border-color: #c7bda8;
+  box-shadow: 0 18px 40px rgba(90, 79, 60, 0.13);
+}
+
+.memo-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 3px double #b6aa94;
+  color: #6b5d45;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.memo-heading span {
+  font-size: 12px;
+}
+
+.memo-heading strong {
+  font-size: 13px;
+}
+
+.annual-report .summary-card {
+  border-color: #d8cfbd;
+  box-shadow: none;
 }
 
 .summary-card h3 {

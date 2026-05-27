@@ -1,4 +1,4 @@
-const BUILD = "ui review 2026-05-27";
+const BUILD = "design exploration 2026-05-27";
 const SAVE_KEY = "sim-academia-3000-save";
 
 const DOMAINS = {
@@ -109,16 +109,16 @@ const ACADEMIC_NAMES = [
 ];
 
 const FUNDERS = [
-  { name: "Departmental Coffee-Ring Seed Fund", minGrant: 80, maxGrant: 120, chance: 0.72 },
+  { name: "Departmental Seed Fund", minGrant: 80, maxGrant: 120, chance: 0.72 },
   { name: "Local Symposium Microgrant", minGrant: 180, maxGrant: 320, chance: 0.48 },
   { name: "Campus Interdisciplinary Initiative", minGrant: 650, maxGrant: 1200, chance: 0.26 },
   { name: "Society for Incremental Discoveries", minGrant: 1800, maxGrant: 3200, chance: 0.16 },
   { name: "Institute for Avant-Garde Research", minGrant: 4500, maxGrant: 8000, chance: 0.09 },
-  { name: "Mysterious Reviewer #2 Endowment", minGrant: 9000, maxGrant: 16000, chance: 0.055 },
+  { name: "Mid-Career Research Endowment", minGrant: 9000, maxGrant: 16000, chance: 0.055 },
   { name: "Bureau of Scholarly Ventures", minGrant: 18000, maxGrant: 32000, chance: 0.032 },
   { name: "The Royal Society of Epistemic Endeavors", minGrant: 35000, maxGrant: 55000, chance: 0.018 },
-  { name: "The Oracular Board of Impactful Grants", minGrant: 65000, maxGrant: 85000, chance: 0.01 },
-  { name: "Infinite Revisions Moonshot Fellowship", minGrant: 90000, maxGrant: 110000, chance: 0.004 },
+  { name: "International Impact Council", minGrant: 65000, maxGrant: 85000, chance: 0.01 },
+  { name: "Frontier Research Fellowship", minGrant: 90000, maxGrant: 110000, chance: 0.004 },
 ];
 
 const ALLOCATIONS = [
@@ -182,7 +182,7 @@ const BASE_REVISION_ACCEPTANCE = 0.5;
 const REVISION_SUPPORTS = [
   {
     key: "preprint",
-    label: "Preprint brag on social media",
+    label: "Preprint visibility campaign",
     cost: 180,
     bonus: 0.04,
     quality: 1,
@@ -194,15 +194,15 @@ const REVISION_SUPPORTS = [
     cost: 950,
     bonus: 0.09,
     quality: 4,
-    note: "Moderately expensive polish: clearer prose, fewer reviewer irritants.",
+    note: "Moderately expensive polish: clearer prose, fewer avoidable objections.",
   },
   {
     key: "corruption",
-    label: "Corrupt editorial board",
+    label: "Discreet editorial consultancy",
     cost: 26000,
     bonus: 0.17,
     quality: 0,
-    note: "Very expensive, very questionable, and mechanically effective.",
+    note: "Very expensive, ethically indistinct, and mechanically effective.",
   },
 ];
 
@@ -227,14 +227,14 @@ const RESEARCH_EVENTS = [
   ["Your central assumption collapses under scrutiny.", -22, "bad"],
   ["A surprisingly elegant theorem falls into place.", 18, "good"],
   ["A messy negative result forces a better framing.", 5, "good"],
-  ["The analysis pipeline quietly corrupts one column.", -12, "bad"],
+  ["The analysis pipeline quietly misaligns one column.", -12, "bad"],
 ];
 
 const REVISION_EVENTS = [
-  ["Reviewer 2 wants twelve more robustness checks.", -7, "warn"],
+  ["A referee requests twelve additional robustness checks.", -7, "warn"],
   ["A friendly reviewer helps clarify your contribution.", 6, "good"],
   ["The editor asks for a shorter introduction.", 3, "good"],
-  ["Your co-author vanishes during revision week.", -5, "bad"],
+  ["Your co-author becomes unavailable during revision week.", -5, "bad"],
   ["The new analysis is stronger than expected.", 9, "good"],
   ["You add a carefully framed limitation section.", 4, "good"],
   ["A robustness check weakens the headline claim.", -6, "warn"],
@@ -380,6 +380,22 @@ const state = {
 
 const app = document.getElementById("app");
 
+function icon(name) {
+  const paths = {
+    menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
+    cv: `<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/><path d="M8 13h8M8 16h6"/>`,
+    save: `<path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4"/><path d="M8 16h8"/>`,
+    load: `<path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/>`,
+    new: `<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/>`,
+    close: `<path d="M6 6l12 12M18 6 6 18"/>`,
+  };
+  return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || ""}</svg>`;
+}
+
+function buttonContent(iconName, label) {
+  return `${icon(iconName)}<span>${label}</span>`;
+}
+
 function rand(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -486,12 +502,12 @@ function experienceLabel(experience = state.player?.experience || 0) {
 }
 
 function qualityLabel(quality = 0) {
-  if (quality >= 300) return "terrifyingly polished";
+  if (quality >= 300) return "exceptionally polished";
   if (quality >= 240) return "formidable";
   if (quality >= 180) return "very strong";
   if (quality >= 125) return "promising";
-  if (quality >= 80) return "fragile but alive";
-  return "academically flammable";
+  if (quality >= 80) return "preliminary";
+  return "not yet dignified";
 }
 
 function investmentLabel(value = 0) {
@@ -505,7 +521,7 @@ function investmentLabel(value = 0) {
 }
 
 function journalTemperament(journal) {
-  if (journal.prestige >= 9) return "selective, ceremonial, faintly terrifying";
+  if (journal.prestige >= 9) return "selective, ceremonial, and exacting";
   if (journal.prestige >= 7) return "ambitious and status-conscious";
   if (journal.prestige >= 5) return "serious, technical, and moderately picky";
   if (journal.prestige >= 3) return "specialist-friendly and pragmatic";
@@ -523,7 +539,7 @@ function eventImpactLabel(change = 0) {
 }
 
 function supportImpactLabel(support) {
-  if (support.key === "corruption") return "dramatic editorial pressure";
+  if (support.key === "corruption") return "substantial editorial pressure";
   if (support.key === "proofreading") return "strong polish";
   if (support.key === "preprint") return "modest visibility";
   return "quiet help";
@@ -609,8 +625,8 @@ function fundingEmail(funder, grant, accepted) {
 
   return oneOf([
     `Dear ${state.player.name},\n\nThank you for applying to ${funder.name}. After careful review, we regret that we cannot offer support in this round.\n\nThe panel found the proposal interesting, but not sufficiently compelling relative to the current competition. We encourage you to apply again when morale has recovered.\n\nSincerely,\nThe Grants Committee`,
-    `Dear ${state.player.name},\n\nWe appreciate the opportunity to review your application to ${funder.name}. Unfortunately, the proposal was not selected for funding.\n\nReviewers noted the intellectual promise of the project, while also expressing concerns using the traditional vocabulary of doom: feasibility, scope, and impact.\n\nRegards,\nProgram Administration`,
-    `Dear ${state.player.name},\n\nThe committee has completed its assessment of your submission to ${funder.name}. We regret to inform you that no award can be made at this time.\n\nThis decision reflects limited funds and a crowded field, not necessarily the cosmic value of your idea.\n\nSincerely,\nThe Funding Office`,
+    `Dear ${state.player.name},\n\nWe appreciate the opportunity to review your application to ${funder.name}. Unfortunately, the proposal was not selected for funding.\n\nReviewers noted the intellectual promise of the project, while also raising familiar concerns: feasibility, scope, and impact.\n\nRegards,\nProgram Administration`,
+    `Dear ${state.player.name},\n\nThe committee has completed its assessment of your submission to ${funder.name}. We regret to inform you that no award can be made at this time.\n\nThis decision reflects limited funds and a crowded field, not necessarily the long-term value of your idea.\n\nSincerely,\nThe Funding Office`,
   ]);
 }
 
@@ -838,10 +854,10 @@ function showMenuPanel() {
     <section class="menu-modal" role="dialog" aria-modal="true">
       <h2>Game Menu</h2>
       <div class="menu-actions">
-        <button id="newGameButton">New game</button>
-        <button id="saveGameButton" ${state.player ? "" : "disabled"}>Save game</button>
-        <button id="loadGameButton">Load game</button>
-        <button id="closeMenuButton" class="primary">Close</button>
+        <button id="newGameButton">${buttonContent("new", "New game")}</button>
+        <button id="saveGameButton" ${state.player ? "" : "disabled"}>${buttonContent("save", "Save game")}</button>
+        <button id="loadGameButton">${buttonContent("load", "Load game")}</button>
+        <button id="closeMenuButton" class="primary">${buttonContent("close", "Close")}</button>
       </div>
       <p class="hint">Save files are stored locally in this browser.</p>
     </section>
@@ -885,7 +901,7 @@ function generateTitle(subdomain) {
     `Measuring ${a} Without Believing the Hype`,
     `The Unreasonable Effectiveness of ${a} in ${subdomain}`,
     `Negative Results for ${a} with Consequences for ${b}`,
-    `A Field Guide to ${a}, ${b}, and Reviewer Anxiety`,
+    `A Field Guide to ${a}, ${b}, and Scholarly Caution`,
     `Scaling Laws for ${a} Under Realistic Assumptions`,
     `What ${b} Reveals About ${a}`,
   ];
@@ -1163,11 +1179,11 @@ function collaborationOffer(colleague) {
       chance: clamp(0.9 + friendBonus, 0, 0.98),
       bonus: 5 + friendQuality,
       malus: 1,
-      acceptedSubject: "YES YES YES collaboration!",
+      acceptedSubject: "Re: possible collaboration",
       acceptedBody: oneOf([
-        `Dear ${state.player.name},\n\nThis is incredible. I have already made a shared folder, a fourteen-tab spreadsheet, and a preliminary title with three colons. I told my department chair we are basically a lab now.\n\nI am so honored. I will send you many thoughts very soon.\n\nWith overwhelming enthusiasm,\n${colleague.name}`,
-        `Dear ${state.player.name},\n\nYes, absolutely yes. I have admired your work from what I would describe as a respectful distance. I can contribute notes, figures, and possibly a manifesto-style introduction.\n\nThis is going to be huge for us.\n\nExcitedly,\n${colleague.name}`,
-        `Dear ${state.player.name},\n\nI cannot believe you asked. I am available immediately and have already cancelled two meetings that probably mattered less.\n\nPlease send everything. I will over-comment with gratitude.\n\nWarmly,\n${colleague.name}`,
+        `Dear ${state.player.name},\n\nThank you for the invitation. I would be very pleased to contribute to the project, and I can prepare a short set of notes this week.\n\nI am grateful to be considered and will do my best to make the collaboration useful.\n\nBest regards,\n${colleague.name}`,
+        `Dear ${state.player.name},\n\nThis is very welcome news. I have followed your recent work with interest and would be happy to help with the framing, figures, or supplementary analysis.\n\nPlease send the draft when convenient.\n\nBest,\n${colleague.name}`,
+        `Dear ${state.player.name},\n\nI would be glad to collaborate. The project is well aligned with questions I have been hoping to pursue, and I can make time for it this semester.\n\nWith appreciation,\n${colleague.name}`,
       ]),
       rejectedSubject: "Re: possible collaboration",
       rejectedBody: `Dear ${state.player.name},\n\nThank you so much for thinking of me. I am genuinely flattered, but I am already overcommitted and would not be able to contribute properly this year.\n\nI hope we find another occasion soon.\n\nBest,\n${colleague.name}`,
@@ -1237,7 +1253,7 @@ function contactCollaborationCandidate(colleague) {
       from: `${colleague.name} <collaboration@university.example>`,
       subject: colleague.friend ? "Of course, let us do this" : offer.acceptedSubject,
       body: colleague.friend
-        ? `Dear ${state.player.name},\n\nOf course. It was good to talk at the congress, and I would be very happy to build something together this year.\n\nSend me the draft when you can. I will read it properly, not the ceremonial kind of properly.\n\nWarmly,\n${colleague.name}`
+        ? `Dear ${state.player.name},\n\nOf course. It was good to talk at the congress, and I would be very happy to build something together this year.\n\nSend me the draft when you can. I will read it with the attention it deserves.\n\nWarmly,\n${colleague.name}`
         : offer.acceptedBody,
       onContinue: () => {
         log(`${colleague.name} joins the project. The draft suddenly has better posture.`, "good");
@@ -1255,7 +1271,7 @@ function contactCollaborationCandidate(colleague) {
     from: `${colleague.name} <collaboration@university.example>`,
     subject: colleague.friend ? "Re: collaboration this year" : offer.rejectedSubject,
     body: colleague.friend
-      ? `Dear ${state.player.name},\n\nI am genuinely sorry, but this semester has become administratively haunted. I cannot join the project without becoming useless to you.\n\nPlease do ask again another time. I would like us to find the right occasion.\n\nWarmly,\n${colleague.name}`
+      ? `Dear ${state.player.name},\n\nI am genuinely sorry, but this semester has become administratively overcommitted. I cannot join the project without becoming useless to you.\n\nPlease do ask again another time. I would like us to find the right occasion.\n\nWarmly,\n${colleague.name}`
       : offer.rejectedBody,
     onContinue: () => {
       log(`${colleague.name} declines the collaboration.`, "warn");
@@ -1268,7 +1284,7 @@ function warnOverenthusiasticCollaborator(colleague) {
   showEmailModal({
     from: "Your Inner Career Strategist <do-not-ignore@self.example>",
     subject: "Are you sure about this collaborator?",
-    body: `Dear ${state.player.name},\n\nThis collaborator looks substantially less established than you. They are very likely to accept and can still improve the paper, but the association may look a little desperate and cost you reputation.\n\nProceed if you want the quality boost. Reconsider if prestige matters more this year.`,
+    body: `Dear ${state.player.name},\n\nThis collaborator looks substantially less established than you. They are very likely to accept and can still improve the paper, but the association may be read as strategically uneven and cost you reputation.\n\nProceed if you want the quality boost. Reconsider if prestige matters more this year.`,
     onContinue: () => contactCollaborationCandidate(colleague),
     secondary: {
       label: "Reconsider",
@@ -1329,26 +1345,27 @@ function shell(content) {
             <div class="build">${BUILD}</div>
           </div>
         </div>
-        <button id="menuButton" class="sidebar-action">Menu</button>
+        <button id="menuButton" class="sidebar-action">${buttonContent("menu", "Menu")}</button>
         ${stats.length ? `<div class="stat-list">
           ${stats.map(([k, v]) => `<div class="stat"><span>${k}</span><strong>${v}</strong></div>`).join("")}
         </div>` : ""}
         ${
           player
-            ? `<button id="seeCv" class="sidebar-action">See my CV</button>
+            ? `<button id="seeCv" class="sidebar-action">${buttonContent("cv", "See my CV")}</button>
               `
             : ""
         }
       </aside>
       <section class="workbench">${content}</section>
       <aside class="rightbar">
-        <div class="panel">
-          <h3>Dashboard Notes</h3>
+        <div class="panel notebook-panel">
+          <p class="panel-kicker">Informal record</p>
+          <h3>Departmental Notes</h3>
           <div class="log-list">
             ${
               state.log.length
                 ? state.log.map((item) => `<div class="log-item ${item.tone}">${item.message}</div>`).join("")
-                : `<p class="empty">No academic disasters yet.</p>`
+                : `<p class="empty">No departmental record yet.</p>`
             }
           </div>
         </div>
@@ -1370,7 +1387,7 @@ function renderProfile() {
         <div>
           <span class="phase-chip">Profile</span>
           <h2>Researcher Profile</h2>
-          <p>Set up the scholar who will brave grants, reviews, citations, and suspiciously expensive conferences.</p>
+          <p>Set up the scholar who will brave grants, reviews, citations, and selective conferences.</p>
         </div>
       </div>
       <div class="form-grid">
@@ -1542,7 +1559,7 @@ function applyForPromotion() {
     showEmailModal({
       from: "Faculty Promotions Committee <appointments@university.example>",
       subject: "Outcome of your promotion application",
-      body: `Dear ${state.player.name},\n\nThe committee is pleased to inform you that your application for promotion to ${promotion.rank} has been successful.\n\nYour scholarly record, external visibility, and evident capacity to keep graduate students productively anxious were viewed favorably. The promotion takes effect immediately.\n\nSincerely,\nThe Faculty Promotions Committee`,
+      body: `Dear ${state.player.name},\n\nThe committee is pleased to inform you that your application for promotion to ${promotion.rank} has been successful.\n\nYour scholarly record, external visibility, and evident capacity to support a larger research group were viewed favorably. The promotion takes effect immediately.\n\nSincerely,\nThe Faculty Promotions Committee`,
       onContinue: renderFunding,
     });
   } else {
@@ -1867,14 +1884,14 @@ function journalEmail(result, final = false) {
   if (result === "accepted") {
     return oneOf([
       `${greeting}\n\nI am delighted to inform you that your ${final ? "revised " : ""}manuscript has been accepted for publication in ${state.selectedJournal.name}.\n\n${paper}\n\nThe reviewers found the contribution persuasive, and the editorial office looks forward to seeing the work enter the scholarly record.\n\nSincerely,\nThe Editor`,
-      `${greeting}\n\nI am pleased to accept your ${final ? "revised " : ""}submission to ${state.selectedJournal.name}.\n\n${paper}\n\nThe manuscript has improved into a clear and publishable contribution. Please expect production queries, proofs, and a suspiciously urgent copyright form.\n\nBest regards,\nThe Handling Editor`,
-      `${greeting}\n\nCongratulations. Your ${final ? "revised " : ""}manuscript has been accepted by ${state.selectedJournal.name}.\n\n${paper}\n\nThe editorial team believes the paper will interest our readers and gently irritate your competitors.\n\nSincerely,\nThe Editor`,
+      `${greeting}\n\nI am pleased to accept your ${final ? "revised " : ""}submission to ${state.selectedJournal.name}.\n\n${paper}\n\nThe manuscript has improved into a clear and publishable contribution. Please expect production queries, proofs, and the usual copyright forms.\n\nBest regards,\nThe Handling Editor`,
+      `${greeting}\n\nCongratulations. Your ${final ? "revised " : ""}manuscript has been accepted by ${state.selectedJournal.name}.\n\n${paper}\n\nThe editorial team believes the paper will interest our readers and draw attention from specialists in the field.\n\nSincerely,\nThe Editor`,
     ]);
   }
   return oneOf([
     `${greeting}\n\nThank you for submitting your ${final ? "revised " : ""}manuscript to ${state.selectedJournal.name}.\n\n${paper}\n\nAfter careful consideration, I regret to inform you that we are unable to accept the manuscript for publication. The reviewers raised concerns that cannot be resolved within the scope of the current submission.\n\nSincerely,\nThe Editor`,
     `${greeting}\n\nWe have completed evaluation of your ${final ? "revised " : ""}manuscript at ${state.selectedJournal.name}.\n\n${paper}\n\nUnfortunately, the reports do not support publication. The reviewers were not convinced that the contribution is sufficiently robust for the journal.\n\nRegards,\nThe Editorial Office`,
-    `${greeting}\n\nThank you for giving ${state.selectedJournal.name} the opportunity to consider your work.\n\n${paper}\n\nI am sorry to say that we must decline the manuscript. The decision was not made lightly, though reviewer three appears to have enjoyed making it loudly.\n\nSincerely,\nThe Editor`,
+    `${greeting}\n\nThank you for giving ${state.selectedJournal.name} the opportunity to consider your work.\n\n${paper}\n\nI am sorry to say that we must decline the manuscript. The decision was not made lightly, though one report was unusually emphatic.\n\nSincerely,\nThe Editor`,
   ]);
 }
 
@@ -2070,7 +2087,7 @@ function renderDecision(result) {
           <span class="phase-chip">Decision</span>
           <h2>${result === "accepted" ? "Accepted" : "Rejected"}</h2>
           <p class="paper-title">${state.currentPaper.title}</p>
-          <p>${result === "accepted" ? "The CV grows heavier." : "The manuscript returns to haunt your desk drawer."}</p>
+          <p>${result === "accepted" ? "The publication record expands." : "The manuscript returns to the private archive."}</p>
         </div>
       </div>
       <div class="actions">
@@ -2147,7 +2164,11 @@ function renderYearSummary() {
     : `<li>No new citations this year.</li>`;
 
   shell(`
-    <div class="screen">
+    <div class="screen annual-report">
+      <div class="memo-heading">
+        <span>Internal memorandum</span>
+        <strong>Office of Academic Affairs</strong>
+      </div>
       <div class="screen-head">
         <div>
           <span class="phase-chip">Year ${state.year}: Annual Summary</span>
@@ -2315,7 +2336,7 @@ function renderCongressTalkChoice() {
         <div>
           <span class="phase-chip">Congress Talks</span>
           <h2>Which talk will you go to?</h2>
-          <p>Choose one session. Academic fate, as usual, hides in the coffee breaks.</p>
+          <p>Choose one session. Professional consequences often begin as ordinary conversations.</p>
         </div>
       </div>
       <div class="program-list">
@@ -2434,7 +2455,7 @@ function renderCongressEnding() {
           <h2>Already the end of the congress</h2>
           <p>${state.congressSummary?.talk || ""}</p>
           <p>${state.congressSummary?.presentation || ""}</p>
-          <p>After partying with your colleagues at a truly memorable conference dinner, it is time to go home and go back to work.</p>
+          <p>After a long conference dinner and the usual institutional farewells, it is time to go home and return to work.</p>
         </div>
       </div>
       <div class="actions centered-actions">
