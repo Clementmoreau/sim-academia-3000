@@ -362,6 +362,25 @@ select {
   font-size: 18px;
 }
 
+.funder-heading {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+.funder-heading strong {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.funder-heading span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
 .choice-meta {
   display: flex;
   justify-content: space-between;
@@ -871,6 +890,10 @@ select {
   font-size: 12px;
   font-style: italic;
   margin-top: 2px;
+}
+
+.final-ranking {
+  margin-top: 12px;
 }
 
 .player-row {

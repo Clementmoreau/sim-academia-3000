@@ -1,4 +1,4 @@
-const BUILD = "design exploration 2026-05-27";
+const BUILD = "retirement polish 2026-05-28";
 const SAVE_KEY = "sim-academia-3000-save";
 
 const DOMAINS = {
@@ -13,7 +13,7 @@ const DOMAINS = {
 };
 
 const INSTITUTIONS = [
-  "Université de Paris-Cité",
+  "Université Paris-Cité",
   "Sorbonne Nouvelle Institute",
   "École Normale de Lyon",
   "Institut Polytechnique de Grenoble",
@@ -109,16 +109,16 @@ const ACADEMIC_NAMES = [
 ];
 
 const FUNDERS = [
-  { name: "Departmental Seed Fund", minGrant: 80, maxGrant: 120, chance: 0.72 },
-  { name: "Local Symposium Microgrant", minGrant: 180, maxGrant: 320, chance: 0.48 },
-  { name: "Campus Interdisciplinary Initiative", minGrant: 650, maxGrant: 1200, chance: 0.26 },
-  { name: "Society for Incremental Discoveries", minGrant: 1800, maxGrant: 3200, chance: 0.16 },
-  { name: "Institute for Avant-Garde Research", minGrant: 4500, maxGrant: 8000, chance: 0.09 },
-  { name: "Mid-Career Research Endowment", minGrant: 9000, maxGrant: 16000, chance: 0.055 },
-  { name: "Bureau of Scholarly Ventures", minGrant: 18000, maxGrant: 32000, chance: 0.032 },
-  { name: "The Royal Society of Epistemic Endeavors", minGrant: 35000, maxGrant: 55000, chance: 0.018 },
-  { name: "International Impact Council", minGrant: 65000, maxGrant: 85000, chance: 0.01 },
-  { name: "Frontier Research Fellowship", minGrant: 90000, maxGrant: 110000, chance: 0.004 },
+  { acronym: "DFLS", name: "Department Funds Last Scraps", minGrant: 80, maxGrant: 120, chance: 0.72 },
+  { acronym: "LSM", name: "Local Symposium Microgrant", minGrant: 180, maxGrant: 320, chance: 0.48 },
+  { acronym: "RKGC", name: "Regional Kickoff Grant Council", minGrant: 650, maxGrant: 1200, chance: 0.26 },
+  { acronym: "SSID", name: "Society for Support of Incremental Discoveries", minGrant: 1800, maxGrant: 3200, chance: 0.16 },
+  { acronym: "NICAR", name: "National Institute for Consolidating Avant-Garde Research", minGrant: 4500, maxGrant: 8000, chance: 0.09 },
+  { acronym: "MCREA", name: "Mid-Career Research Endowment Agency", minGrant: 9000, maxGrant: 16000, chance: 0.055 },
+  { acronym: "FTTR", name: "Foundation for Transformative and Transdisciplinary Research", minGrant: 18000, maxGrant: 32000, chance: 0.032 },
+  { acronym: "RSEEE", name: "The Royal Society of Excellent Epistemic Endeavors", minGrant: 35000, maxGrant: 55000, chance: 0.018 },
+  { acronym: "ICEC", name: "International Cutting Edge Council", minGrant: 65000, maxGrant: 85000, chance: 0.01 },
+  { acronym: "WHFPAF", name: "World Human Frontier Prestige Advanced Fellowship", minGrant: 90000, maxGrant: 110000, chance: 0.004 },
 ];
 
 const ALLOCATIONS = [
@@ -241,16 +241,16 @@ const REVISION_EVENTS = [
 ];
 
 const JOURNAL_TEMPLATES = [
-  ["Proceedings of Preliminary {subdomain}", 1, 50],
-  ["Regional Letters in {subdomain}", 2, 72],
-  ["Annals of Applied {subdomain}", 3, 94],
+  ["Proceedings of the Provincial Society of {subdomain}", 1, 50],
+  ["Letters in Preliminary {subdomain}", 2, 72],
+  ["Regional Annals of Applied {subdomain}", 3, 94],
   ["Journal of Emerging {subdomain}", 4, 120],
   ["Transactions on {subdomain}", 5, 152],
   ["International Review of {subdomain}", 6, 192],
   ["Advanced Studies in {subdomain}", 7, 240],
   ["Frontiers of Theoretical {subdomain}", 8, 280],
-  ["Nature Reviews in {subdomain}", 9, 330],
-  ["Annals of Transformative {subdomain}", 10, 390],
+  ["The Academy Proceedings: {subdomain}", 9, 330],
+  ["Annals of The Universal Society of {subdomain}", 10, 390],
 ];
 
 const KEYWORDS = {
@@ -339,6 +339,24 @@ const CONGRESS_LOCATIONS = [
   "São Paulo, Brazil",
 ];
 
+const CONGRESS_DISHES = {
+  "Vienna, Austria": "Wiener schnitzel",
+  "Barcelona, Spain": "paella",
+  "Kyoto, Japan": "kaiseki",
+  "Boston, USA": "clam chowder",
+  "Montréal, Canada": "poutine",
+  Singapore: "chili crab",
+  "Berlin, Germany": "currywurst",
+  "Cape Town, South Africa": "bobotie",
+  "Melbourne, Australia": "lamingtons",
+  "Copenhagen, Denmark": "smørrebrød",
+  "Seoul, South Korea": "bibimbap",
+  "Lisbon, Portugal": "bacalhau",
+  "Vancouver, Canada": "wild salmon",
+  "Edinburgh, Scotland": "haggis",
+  "São Paulo, Brazil": "feijoada",
+};
+
 const state = {
   screen: "profile",
   phase: "Profile",
@@ -376,6 +394,7 @@ const state = {
   promotionHistory: [],
   rejectionHistory: [],
   collaborationName: null,
+  retirementWarningShown: false,
 };
 
 const app = document.getElementById("app");
@@ -394,6 +413,18 @@ function icon(name) {
 
 function buttonContent(iconName, label) {
   return `${icon(iconName)}<span>${label}</span>`;
+}
+
+function academicDisplayName(name, rank) {
+  const cleanName = name.replace(/^(Dr\.|Prof\.)\s+/i, "");
+  if (rank === "Full Professor") return `Prof. ${cleanName}`;
+  if (/^(Dr\.|Prof\.)\s+/i.test(name)) return `Dr. ${cleanName}`;
+  return name;
+}
+
+function promoteDisplayName(name) {
+  const cleanName = name.replace(/^(Dr\.|Prof\.)\s+/i, "");
+  return `Prof. ${cleanName}`;
 }
 
 function rand(items) {
@@ -498,7 +529,7 @@ function experienceLabel(experience = state.player?.experience || 0) {
   if (experience >= 45) return "seasoned";
   if (experience >= 25) return "confident";
   if (experience >= 12) return "developing";
-  return "newly caffeinated";
+  return "newbie";
 }
 
 function qualityLabel(quality = 0) {
@@ -507,7 +538,7 @@ function qualityLabel(quality = 0) {
   if (quality >= 180) return "very strong";
   if (quality >= 125) return "promising";
   if (quality >= 80) return "preliminary";
-  return "not yet dignified";
+  return "shameful";
 }
 
 function investmentLabel(value = 0) {
@@ -585,7 +616,8 @@ function formatAuthors(authors = []) {
   const cleanAuthors = authors.filter(Boolean);
   if (!cleanAuthors.length) return "Unknown author";
   return cleanAuthors.map((name) => {
-    const parts = name.trim().split(/\s+/);
+    const titleless = name.trim().replace(/^(Dr\.|Prof\.)\s+/i, "");
+    const parts = titleless.split(/\s+/);
     const family = parts.pop() || name;
     const initials = parts.map((part) => `${part[0]}.`).join(" ");
     return initials ? `${family}, ${initials}` : family;
@@ -677,6 +709,7 @@ function restoreState(saved) {
     promotionHistory: [],
     rejectionHistory: [],
     collaborationName: null,
+    retirementWarningShown: false,
   }, saved, {
     usedFunders: new Set(saved.usedFunders || []),
     collaborationAttempts: new Set(saved.collaborationAttempts || []),
@@ -697,7 +730,9 @@ function restoreState(saved) {
     promotionHistory: saved.promotionHistory || [],
     rejectionHistory: saved.rejectionHistory || [],
     collaborationName: saved.collaborationName || null,
+    retirementWarningShown: saved.retirementWarningShown || false,
   });
+  if (state.player?.rank === "Full Professor") state.player.name = promoteDisplayName(state.player.name);
 }
 
 function saveGame() {
@@ -1070,7 +1105,7 @@ function generateColleagues(includePlayer = false) {
     const citations = citationsFromScore(score);
     return {
       id: `colleague-${index}-${score}`,
-      name: names[index % names.length],
+      name: academicDisplayName(names[index % names.length], rank),
       institution: rand(INSTITUTIONS),
       field: `${rand(Object.keys(DOMAINS))}`,
       rank,
@@ -1088,7 +1123,7 @@ function generateColleagues(includePlayer = false) {
   if (includePlayer) {
     colleagues.push({
       id: "player",
-      name: state.player.name,
+      name: academicDisplayName(state.player.name, state.player.rank),
       institution: state.player.institution,
       field: state.player.domain,
       rank: state.player.rank,
@@ -1121,7 +1156,7 @@ function showColleaguesModal() {
     ...yearlyColleagues(),
     {
       id: "player",
-      name: state.player.name,
+      name: academicDisplayName(state.player.name, state.player.rank),
       institution: state.player.institution,
       field: state.player.domain,
       rank: state.player.rank,
@@ -1140,7 +1175,6 @@ function showColleaguesModal() {
       <div class="screen-head">
         <div>
           <h2>Colleague Comparison</h2>
-          <p>The ordering reflects a hidden mix of visibility, experience, position, citations, and distinctions. Your own standing is not disclosed.</p>
         </div>
       </div>
       <div class="ranking-list">
@@ -1150,7 +1184,7 @@ function showColleaguesModal() {
               <div class="ranking-row ${colleague.player ? "player-row" : ""}">
                 <strong>${index + 1}</strong>
                 <div>
-                  <h3>${colleague.name}${colleague.friend ? " · friend" : ""}</h3>
+                  <h3>${academicDisplayName(colleague.name, colleague.rank)}${colleague.friend ? " · friend" : ""}</h3>
                   <p>${colleague.rank}, ${colleague.institution}</p>
                 </div>
                 <span>${colleague.player ? "Hidden" : colleague.label}</span>
@@ -1463,7 +1497,10 @@ function renderFunding() {
           const used = state.usedFunders.has(index);
           return `
             <article class="choice">
-              <h3>${funder.name}</h3>
+              <div class="funder-heading">
+                <strong>${funder.acronym}</strong>
+                <span>${funder.name}</span>
+              </div>
               <div class="choice-meta"><span>Typical award: ${grantBand(funder)}</span></div>
               <button data-funder="${index}" ${used ? "disabled" : ""}>${used ? "Rejected" : "Apply"}</button>
             </article>
@@ -1538,7 +1575,7 @@ function renderPromotionOffer(promotion) {
       </div>
       <div class="panel">
         <h3>Promotion dossier</h3>
-        <p>The committee will review your publications, reputation, external recognition, and the intangible aura of scholarly inevitability. The odds are not disclosed.</p>
+        <p>The committee will review your publications, reputation, external recognition, and the intangible aura of scholarly inevitability.</p>
       </div>
       <div class="actions">
         <button id="applyPromotion" class="primary">Apply for ${promotion.rank}</button>
@@ -1555,6 +1592,7 @@ function applyForPromotion() {
   const accepted = Math.random() < promotionChance(promotion);
   if (accepted) {
     state.player.rank = promotion.rank;
+    if (promotion.rank === "Full Professor") state.player.name = promoteDisplayName(state.player.name);
     state.promotionHistory.push({ rank: promotion.rank, year: state.year });
     showEmailModal({
       from: "Faculty Promotions Committee <appointments@university.example>",
@@ -1651,7 +1689,7 @@ function renderCollaboration() {
         <div>
           <span class="phase-chip">Year ${state.year}: Allocation</span>
           <h2>Collaboration</h2>
-          <p>Choose one colleague to contact. You can see their academic aura, but your own standing remains obscure.</p>
+          <p>Choose one colleague to contact.</p>
         </div>
         <button id="skipCollaboration">${allContacted ? "Begin research" : "Proceed without collaboration"}</button>
       </div>
@@ -1662,7 +1700,7 @@ function renderCollaboration() {
               <div class="ranking-row">
                 <strong>${index + 1}</strong>
                 <div>
-                  <h3>${colleague.name}</h3>
+                  <h3>${academicDisplayName(colleague.name, colleague.rank)}</h3>
                   <p>${colleague.rank}, ${colleague.institution}</p>
                   <p class="relationship-note">${relationshipLabel(colleague)}</p>
                 </div>
@@ -2087,7 +2125,7 @@ function renderDecision(result) {
           <span class="phase-chip">Decision</span>
           <h2>${result === "accepted" ? "Accepted" : "Rejected"}</h2>
           <p class="paper-title">${state.currentPaper.title}</p>
-          <p>${result === "accepted" ? "The publication record expands." : "The manuscript returns to the private archive."}</p>
+          <p>${result === "accepted" ? "A happy year! Science has advanced today." : "The manuscript returns to the drawer, and you return to work."}</p>
         </div>
       </div>
       <div class="actions">
@@ -2137,13 +2175,13 @@ function yearPerformanceScore(summary) {
 function deansComment(score) {
   if (score <= 0) return "The department appreciates your continued presence.";
   if (score <= 4) return "The chair mentions your paper twice in a meeting.";
-  return "You are suddenly invited to too many panels.";
+  return "You are the face of the department's latest photo op.";
 }
 
 function careerMomentum(score) {
   const recentCitations = state.citationHistory.slice(-3).reduce((sum, item) => sum + item.citations, 0);
   const momentum = score + Math.min(6, Math.floor(recentCitations / 60)) + (state.player.rank === "Full Professor" ? 2 : 0);
-  if (momentum >= 9) return "dangerously visible";
+  if (momentum >= 9) return "local star";
   if (momentum >= 5) return "visible";
   if (momentum >= 2) return "building";
   return "stagnant";
@@ -2196,7 +2234,7 @@ function renderYearSummary() {
         </section>
       </div>
       <h3>Distinctions</h3>
-      <p class="hint">Distinctions unlock in order once your citations are high enough. They cost funds, but citations are never spent.</p>
+      <p class="hint">Distinctions unlock in order once your citations are high enough.</p>
       <div class="grid">
         ${VANITY.map((vanity, index) => {
           const owned = state.vanity.includes(vanity.item);
@@ -2229,11 +2267,39 @@ function continueAfterAnnualReport() {
     renderRetirementInvitation();
     return;
   }
+  if (state.year === state.yearLimit - 5 && !state.retirementWarningShown) {
+    renderRetirementWarning();
+    return;
+  }
   if (state.year % 4 === 0) {
     renderCongressInvitation();
     return;
   }
   nextYear();
+}
+
+function renderRetirementWarning() {
+  state.phase = "Retirement Warning";
+  state.retirementWarningShown = true;
+  shell(`
+    <div class="screen">
+      <div class="screen-head">
+        <div>
+          <span class="phase-chip">Five Years Remaining</span>
+          <h2>The final stretch begins</h2>
+          <p>The department has quietly started using the word “legacy.” Five years remain before retirement, which is long enough to reshape a career and short enough for every decision to look intentional.</p>
+        </div>
+      </div>
+      <section class="summary-card">
+        <h3>Confidential note</h3>
+        <p>Prestige now matters more visibly. Citations will keep accumulating, late collaborations can still change the ending, and one well-placed paper may become the story everyone remembers.</p>
+      </section>
+      <div class="actions centered-actions">
+        <button id="continueFinalStretch" class="primary">Begin the final five years</button>
+      </div>
+    </div>
+  `);
+  document.getElementById("continueFinalStretch").addEventListener("click", nextYear);
 }
 
 function ordinal(number) {
@@ -2269,7 +2335,7 @@ function renderCongressInvitation() {
 function congressSpeakerPool() {
   return shuffled(yearlyColleagues()).slice(0, 5).map((speaker) => ({
     id: speaker.id,
-    name: speaker.name,
+    name: academicDisplayName(speaker.name, speaker.rank),
     label: speaker.label,
     rank: speaker.rank,
     institution: speaker.institution,
@@ -2289,6 +2355,10 @@ function ensureCongressProgram(congressNumber) {
   return state.congressProgram;
 }
 
+function conferenceDish(location) {
+  return CONGRESS_DISHES[location] || "an ambitious local specialty";
+}
+
 function renderCongressProgram(congressNumber) {
   state.phase = "Congress";
   const program = ensureCongressProgram(congressNumber);
@@ -2298,7 +2368,7 @@ function renderCongressProgram(congressNumber) {
         <div>
           <span class="phase-chip">${ordinal(congressNumber)} Congress</span>
           <h2>${ordinal(congressNumber)} International Congress of ${state.player.subdomain}</h2>
-          <p>${program.location}. Researchers arrive with poster tubes, jet lag, and extremely specific complaints about session scheduling.</p>
+          <p>This year, the Congress is held in ${program.location}. Researchers arrive with poster tubes, jet lag, and extremely specific complaints about session scheduling.</p>
         </div>
       </div>
       <div class="program-list">
@@ -2447,6 +2517,7 @@ function resolvePresentation(style) {
 
 function renderCongressEnding() {
   state.phase = "Congress Ending";
+  const dinnerDish = conferenceDish(state.congressProgram?.location);
   shell(`
     <div class="screen congress-screen">
       <div class="screen-head">
@@ -2455,7 +2526,7 @@ function renderCongressEnding() {
           <h2>Already the end of the congress</h2>
           <p>${state.congressSummary?.talk || ""}</p>
           <p>${state.congressSummary?.presentation || ""}</p>
-          <p>After a long conference dinner and the usual institutional farewells, it is time to go home and return to work.</p>
+          <p>The conference dinner was truly magnificent this year. They even served ${dinnerDish}. You made a joke about the registration fee being so high because of the dinner, and it made everyone laugh at your table. Now it is time to go home and get back to work.</p>
         </div>
       </div>
       <div class="actions centered-actions">
@@ -2539,11 +2610,38 @@ function careerTimeline() {
   ];
 }
 
+function finalColleagueRanking() {
+  const playerScore = careerScore();
+  const ranking = [
+    ...yearlyColleagues(),
+    {
+      id: "player",
+      name: academicDisplayName(state.player.name, state.player.rank),
+      institution: state.player.institution,
+      rank: state.player.rank,
+      score: playerScore,
+      label: retirementTitle(),
+      player: true,
+    },
+  ]
+    .map((colleague) => ({
+      ...colleague,
+      score: colleague.player ? playerScore : colleague.score || colleagueScore(colleague),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  return {
+    ranking,
+    playerPosition: ranking.findIndex((colleague) => colleague.player) + 1,
+  };
+}
+
 function renderCareerEnd() {
   state.phase = "Career End";
   const h = hIndex();
   const achievements = capstoneAchievements();
   const timeline = careerTimeline();
+  const finalRanking = finalColleagueRanking();
   shell(`
     <div class="screen">
       <div class="screen-head">
@@ -2561,6 +2659,27 @@ function renderCareerEnd() {
         <div class="choice"><h3>Final rank</h3><p>${state.player.rank}</p></div>
         <div class="choice"><h3>Distinctions</h3><p>${state.vanity.length}</p></div>
       </div>
+      <section class="summary-card">
+        <h3>Global Colleague Ranking</h3>
+        <p>You retire at position <strong>#${finalRanking.playerPosition}</strong> out of ${finalRanking.ranking.length} visible colleagues.</p>
+        <div class="ranking-list final-ranking">
+          ${finalRanking.ranking
+            .map(
+              (colleague, index) => `
+                <div class="ranking-row ${colleague.player ? "player-row" : ""}">
+                  <strong>${index + 1}</strong>
+                  <div>
+                    <h3>${academicDisplayName(colleague.name, colleague.rank)}${colleague.friend ? " · friend" : ""}</h3>
+                    <p>${colleague.rank}, ${colleague.institution}</p>
+                  </div>
+                  <span>${colleague.player ? "You" : colleague.label}</span>
+                  <em>${colleague.player ? retirementTitle() : "Colleague"}</em>
+                </div>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
       <section class="summary-card">
         <h3>Capstone Achievements</h3>
         <ul>${achievements.map((item) => `<li>${item}</li>`).join("")}</ul>
@@ -2643,6 +2762,10 @@ function renderCurrentState() {
   }
   if (state.phase === "Congress Ending") {
     renderCongressEnding();
+    return;
+  }
+  if (state.phase === "Retirement Warning") {
+    renderRetirementWarning();
     return;
   }
   if (state.phase === "Retirement") {
