@@ -1539,13 +1539,33 @@ function renderProfile() {
     };
     state.collaborationCandidates = generateColleagues(false);
     startYearSummary();
-    state.phase = "Funding";
+    state.phase = "Welcome";
     log(`${state.player.name} begins at ${state.player.institution}.`, "good");
-    beginYear();
+    renderCareerWelcome();
   });
 }
 
+function renderCareerWelcome() {
+  state.phase = "Welcome";
+  shell(`
+    <div class="screen">
+      <div class="screen-head">
+        <div>
+          <span class="phase-chip">Appointment</span>
+          <h2>Welcome to ${state.player.institution}</h2>
+          <p>You just got a position at ${state.player.institution}! An exciting career awaits. Along the journey, you will try to publish papers in prestigious journals, apply for fancy grants, climb the academic ladder and reward yourself with vanity items that will make your colleagues jealous. For now, time to get to work in your office.</p>
+        </div>
+      </div>
+      <div class="actions centered-actions">
+        <button id="getToWork" class="primary">Get to work</button>
+      </div>
+    </div>
+  `);
+  document.getElementById("getToWork").addEventListener("click", beginYear);
+}
+
 function renderFunding() {
+  state.phase = "Funding";
   shell(`
     <div class="screen">
       <div class="screen-head">
@@ -1627,6 +1647,7 @@ function beginYear() {
 }
 
 function renderPromotionOffer(promotion) {
+  state.phase = "Career Review";
   state.pendingPromotion = promotion;
   shell(`
     <div class="screen">
@@ -2464,15 +2485,29 @@ function renderCongressProgram(congressNumber) {
 function renderCongressTalkChoice() {
   state.phase = "Congress Talks";
   const program = ensureCongressProgram(state.year / 4);
+  if (!state.congressSummary || !Array.isArray(state.congressSummary.talks)) {
+    state.congressSummary = { talks: [], presentation: "", speakers: [], actions: [] };
+  }
+  const attendedIds = new Set(state.congressSummary.talks.map((talk) => talk.id));
+  const talkCount = state.congressSummary.talks.length;
   shell(`
     <div class="screen congress-screen">
       <div class="screen-head">
         <div>
           <span class="phase-chip">Congress Talks</span>
           <h2>Which talk will you go to?</h2>
-          <p>Choose one session. Professional consequences often begin as ordinary conversations.</p>
+          <p>Choose two sessions. Professional consequences often begin as ordinary conversations.</p>
         </div>
       </div>
+      <section class="summary-card">
+        <h3>Talks attended</h3>
+        ${
+          state.congressSummary.talks.length
+            ? `<ul>${state.congressSummary.talks.map((talk) => `<li>${talk.summary}</li>`).join("")}</ul>`
+            : `<p class="hint">No talks attended yet.</p>`
+        }
+        <p class="hint">${talkCount} / 2 talks attended.</p>
+      </section>
       <div class="program-list">
         ${program.speakers
           .map(
@@ -2482,9 +2517,9 @@ function renderCongressTalkChoice() {
                 <p>${speaker.label}</p>
                 <strong>${speaker.title}</strong>
                 <div class="actions">
-                  <button data-talk-action="notes" data-speaker="${speaker.id}">Listen silently and take notes</button>
-                  <button data-talk-action="question" data-speaker="${speaker.id}">Ask a question</button>
-                  <button data-talk-action="chat" data-speaker="${speaker.id}">Go chat after the talk</button>
+                  <button data-talk-action="notes" data-speaker="${speaker.id}" ${attendedIds.has(speaker.id) ? "disabled" : ""}>Listen silently and take notes</button>
+                  <button data-talk-action="question" data-speaker="${speaker.id}" ${attendedIds.has(speaker.id) ? "disabled" : ""}>Ask a question</button>
+                  <button data-talk-action="chat" data-speaker="${speaker.id}" ${attendedIds.has(speaker.id) ? "disabled" : ""}>Go chat after the talk</button>
                 </div>
               </article>
             `
@@ -2526,7 +2561,19 @@ function resolveTalkInteraction(speaker, action) {
     summary = `${speaker.name} was polite after the talk, but kept glancing toward someone more famous. Nothing much came of it.`;
   }
 
-  state.congressSummary = { talk: summary, presentation: "", speaker: speaker.name, action };
+  if (!state.congressSummary || !Array.isArray(state.congressSummary.talks)) {
+    state.congressSummary = { talks: [], presentation: "", speakers: [], actions: [] };
+  }
+  state.congressSummary.talks.push({ id: speaker.id, speaker: speaker.name, action, summary });
+  state.congressSummary.speakers = state.congressSummary.talks.map((talk) => talk.speaker);
+  state.congressSummary.actions = state.congressSummary.talks.map((talk) => talk.action);
+  state.congressSummary.speaker = state.congressSummary.speakers.join("; ");
+  state.congressSummary.action = state.congressSummary.actions.join("; ");
+  state.congressSummary.talk = state.congressSummary.talks.map((talk) => talk.summary).join(" ");
+  if (state.congressSummary.talks.length < 2) {
+    renderCongressTalkChoice();
+    return;
+  }
   renderPlayerPresentation();
 }
 
@@ -2588,7 +2635,11 @@ function renderCongressEnding() {
         <div>
           <span class="phase-chip">Congress Complete</span>
           <h2>Already the end of the congress</h2>
-          <p>${state.congressSummary?.talk || ""}</p>
+          ${
+            state.congressSummary?.talks?.length
+              ? `<ul>${state.congressSummary.talks.map((talk) => `<li>${talk.summary}</li>`).join("")}</ul>`
+              : `<p>${state.congressSummary?.talk || ""}</p>`
+          }
           <p>${state.congressSummary?.presentation || ""}</p>
           <p>The conference dinner was truly magnificent this year. They even served ${dinnerDish}. You made a joke about the registration fee being so high because of the dinner, and it made everyone laugh at your table. Now it is time to go home and get back to work.</p>
         </div>
@@ -2604,9 +2655,9 @@ function renderCongressEnding() {
         year: state.year,
         number: state.congressProgram.number,
         location: state.congressProgram.location,
-        speaker: state.congressSummary.speaker,
-        action: state.congressSummary.action,
-        talk: state.congressSummary.talk,
+        speaker: state.congressSummary.speaker || state.congressSummary.speakers?.join("; "),
+        action: state.congressSummary.action || state.congressSummary.actions?.join("; "),
+        talk: state.congressSummary.talk || state.congressSummary.talks?.map((talk) => talk.summary).join(" "),
         presentation: state.congressSummary.presentation,
       });
     }
@@ -2782,6 +2833,14 @@ function renderCurrentState() {
   }
   if (state.phase === "Funding") {
     renderFunding();
+    return;
+  }
+  if (state.phase === "Welcome") {
+    renderCareerWelcome();
+    return;
+  }
+  if (state.phase === "Career Review" && state.pendingPromotion) {
+    renderPromotionOffer(state.pendingPromotion);
     return;
   }
   if (state.phase === "Allocation") {
