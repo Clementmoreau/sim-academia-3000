@@ -1,5 +1,8 @@
-const BUILD = "retirement polish 2026-05-28";
+const BUILD = "";
 const SAVE_KEY = "sim-academia-3000-save";
+const PLAYTEST_NOTE_KEY = "sim-academia-3000-playtest-note";
+const FEEDBACK_URL =
+  "https://github.com/Clementmoreau/sim-academia-3000/issues/new?title=Playtest%20feedback&body=Browser%3A%0AApproximate%20playtime%3A%0A%0AWas%20it%20fun%3F%0A%0ADid%20you%20understand%20what%20you%20were%20trying%20to%20do%3F%0A%0ADid%20the%20hidden%20numbers%20feel%20funny%20or%20frustrating%3F%0A%0ABest%20moment%3A%0A%0AMost%20confusing%20moment%3A%0A%0ADid%20you%20want%20to%20replay%3F%0A%0AAny%20UI%20pain%3F%0A";
 
 const DOMAINS = {
   Mathematics: ["Algebraic Geometry", "Number Theory", "Dynamical Systems", "Probability Theory", "Partial Differential Equations", "Topology"],
@@ -403,6 +406,7 @@ function icon(name) {
   const paths = {
     menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
     cv: `<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/><path d="M8 13h8M8 16h6"/>`,
+    feedback: `<path d="M21 12a8 8 0 0 1-8 8H7l-4 3v-7a8 8 0 1 1 18-4Z"/><path d="M8 10h8M8 14h5"/>`,
     save: `<path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4"/><path d="M8 16h8"/>`,
     load: `<path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/>`,
     new: `<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/>`,
@@ -912,6 +916,63 @@ function showMenuPanel() {
   });
 }
 
+function showPlaytesterNote() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-backdrop";
+  overlay.innerHTML = `
+    <section class="playtest-modal" role="dialog" aria-modal="true" aria-labelledby="playtestTitle">
+      <p class="panel-kicker">Playtest build</p>
+      <h2 id="playtestTitle">Before you begin</h2>
+      <div class="email-body">
+        <p>Please play one full academic career if you can. Do not try to optimize too hard on the first run; the game is meant to feel partly legible and partly unfair in the usual institutional way.</p>
+        <p>After playing, use the Feedback button to tell us where you felt delighted, confused, bored, cheated, or tempted to replay.</p>
+      </div>
+      <div class="actions">
+        <button id="openFeedbackFromNote">${buttonContent("feedback", "Feedback questions")}</button>
+        <button class="primary" id="closePlaytestNote">Begin</button>
+      </div>
+    </section>
+  `;
+  app.appendChild(overlay);
+  document.getElementById("closePlaytestNote").addEventListener("click", () => overlay.remove());
+  document.getElementById("openFeedbackFromNote").addEventListener("click", () => {
+    overlay.remove();
+    showFeedbackModal();
+  });
+}
+
+function maybeShowPlaytesterNote() {
+  if (sessionStorage.getItem(PLAYTEST_NOTE_KEY)) return;
+  sessionStorage.setItem(PLAYTEST_NOTE_KEY, "shown");
+  window.setTimeout(showPlaytesterNote, 100);
+}
+
+function showFeedbackModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-backdrop";
+  overlay.innerHTML = `
+    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <p class="panel-kicker">Playtester feedback</p>
+      <h2 id="feedbackTitle">After one run</h2>
+      <ol class="feedback-questions">
+        <li>Was it fun?</li>
+        <li>Did you understand what you were trying to do?</li>
+        <li>Did the hidden numbers feel funny or frustrating?</li>
+        <li>What was the best moment?</li>
+        <li>What was the most confusing moment?</li>
+        <li>Did you want to replay?</li>
+        <li>Any UI pain?</li>
+      </ol>
+      <div class="actions">
+        <a class="button-link primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Leave feedback on GitHub</a>
+        <button id="closeFeedback">${buttonContent("close", "Close")}</button>
+      </div>
+    </section>
+  `;
+  app.appendChild(overlay);
+  document.getElementById("closeFeedback").addEventListener("click", () => overlay.remove());
+}
+
 function generateTitle(subdomain) {
   const words = KEYWORDS[subdomain] || ["Models", "Frameworks", "Evidence", "Systems"];
   const a = rand(words);
@@ -1376,10 +1437,11 @@ function shell(content) {
           </svg>
           <div>
             <h1>Sim Academia 3000</h1>
-            <div class="build">${BUILD}</div>
+            ${BUILD ? `<div class="build">${BUILD}</div>` : ""}
           </div>
         </div>
         <button id="menuButton" class="sidebar-action">${buttonContent("menu", "Menu")}</button>
+        <button id="feedbackButton" class="sidebar-action">${buttonContent("feedback", "Feedback")}</button>
         ${stats.length ? `<div class="stat-list">
           ${stats.map(([k, v]) => `<div class="stat"><span>${k}</span><strong>${v}</strong></div>`).join("")}
         </div>` : ""}
@@ -1411,6 +1473,8 @@ function shell(content) {
   if (cvButton) cvButton.addEventListener("click", showCvModal);
   const menuButton = document.getElementById("menuButton");
   if (menuButton) menuButton.addEventListener("click", showMenuPanel);
+  const feedbackButton = document.getElementById("feedbackButton");
+  if (feedbackButton) feedbackButton.addEventListener("click", showFeedbackModal);
 }
 
 function renderProfile() {
@@ -2776,3 +2840,4 @@ function renderCurrentState() {
 }
 
 renderProfile();
+maybeShowPlaytesterNote();
