@@ -1,8 +1,6 @@
 const BUILD = "";
 const SAVE_KEY = "sim-academia-3000-save";
 const PLAYTEST_NOTE_KEY = "sim-academia-3000-playtest-note";
-const FEEDBACK_URL =
-  "https://github.com/Clementmoreau/sim-academia-3000/issues/new?title=Playtest%20feedback&body=Browser%3A%0AApproximate%20playtime%3A%0A%0AWas%20it%20fun%3F%0A%0ADid%20you%20understand%20what%20you%20were%20trying%20to%20do%3F%0A%0ADid%20the%20hidden%20numbers%20feel%20funny%20or%20frustrating%3F%0A%0ABest%20moment%3A%0A%0AMost%20confusing%20moment%3A%0A%0ADid%20you%20want%20to%20replay%3F%0A%0AAny%20UI%20pain%3F%0A";
 
 const DOMAINS = {
   Mathematics: ["Algebraic Geometry", "Number Theory", "Dynamical Systems", "Probability Theory", "Partial Differential Equations", "Topology"],
@@ -947,29 +945,146 @@ function maybeShowPlaytesterNote() {
   window.setTimeout(showPlaytesterNote, 100);
 }
 
+function currentRunSnapshot() {
+  if (!state.player) return "No career started yet.";
+  return [
+    `Year: ${state.year}/${state.yearLimit}`,
+    `Rank: ${state.player.rank}`,
+    `Institution: ${state.player.institution}`,
+    `Field: ${state.player.domain} / ${state.player.subdomain}`,
+    `Publications: ${state.publications.length}`,
+    `Citations: ${state.citations}`,
+    `Vanity items: ${state.vanity.length}`,
+    `Current screen: ${state.screen}`,
+  ].join("\n");
+}
+
+function feedbackTextFromForm(overlay) {
+  const value = (id) => overlay.querySelector(`#${id}`)?.value.trim() || "";
+  return [
+    "Sim Academia 3000 playtest feedback",
+    `Date: ${new Date().toISOString()}`,
+    `Browser URL: ${location.href}`,
+    "",
+    "Run snapshot",
+    currentRunSnapshot(),
+    "",
+    "Player",
+    value("feedbackName") || "(not provided)",
+    "",
+    "Approximate playtime",
+    value("feedbackPlaytime") || "(not provided)",
+    "",
+    "Was it fun?",
+    value("feedbackFun") || "(not answered)",
+    "",
+    "What felt clear or confusing?",
+    value("feedbackClarity") || "(not answered)",
+    "",
+    "Best moment",
+    value("feedbackBest") || "(not answered)",
+    "",
+    "Most frustrating or unfair moment",
+    value("feedbackFrustration") || "(not answered)",
+    "",
+    "Did you want to replay?",
+    value("feedbackReplay") || "(not answered)",
+    "",
+    "Bugs, UI pain, or text issues",
+    value("feedbackBugs") || "(not answered)",
+    "",
+    "One sentence verdict",
+    value("feedbackVerdict") || "(not answered)",
+  ].join("\n");
+}
+
+function downloadTextFile(filename, content) {
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function showFeedbackModal() {
   const overlay = document.createElement("div");
   overlay.className = "modal-backdrop";
   overlay.innerHTML = `
     <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <p class="panel-kicker">Playtester feedback</p>
-      <h2 id="feedbackTitle">After one run</h2>
-      <ol class="feedback-questions">
-        <li>Was it fun?</li>
-        <li>Did you understand what you were trying to do?</li>
-        <li>Did the hidden numbers feel funny or frustrating?</li>
-        <li>What was the best moment?</li>
-        <li>What was the most confusing moment?</li>
-        <li>Did you want to replay?</li>
-        <li>Any UI pain?</li>
-      </ol>
+      <h2 id="feedbackTitle">Tell us how it went</h2>
+      <p class="hint">No external account needed. Write freely, then copy or download the note and send it back however is easiest.</p>
+      <div class="feedback-grid">
+        <label>
+          <span>Name or initials, optional</span>
+          <input id="feedbackName" autocomplete="name" />
+        </label>
+        <label>
+          <span>Approximate playtime</span>
+          <input id="feedbackPlaytime" placeholder="e.g. 20 minutes, one full career..." />
+        </label>
+      </div>
+      <label class="feedback-field">
+        <span>Was it fun?</span>
+        <textarea id="feedbackFun" rows="3"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>What felt clear or confusing?</span>
+        <textarea id="feedbackClarity" rows="3"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>Best moment</span>
+        <textarea id="feedbackBest" rows="2"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>Most frustrating or unfair moment</span>
+        <textarea id="feedbackFrustration" rows="2"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>Did you want to replay?</span>
+        <textarea id="feedbackReplay" rows="2"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>Bugs, UI pain, or text issues</span>
+        <textarea id="feedbackBugs" rows="3"></textarea>
+      </label>
+      <label class="feedback-field">
+        <span>One sentence verdict</span>
+        <textarea id="feedbackVerdict" rows="2"></textarea>
+      </label>
+      <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
       <div class="actions">
-        <a class="button-link primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Leave feedback on GitHub</a>
+        <button class="primary" id="copyFeedback">${buttonContent("feedback", "Copy feedback")}</button>
+        <button id="downloadFeedback">${buttonContent("save", "Download note")}</button>
         <button id="closeFeedback">${buttonContent("close", "Close")}</button>
       </div>
     </section>
   `;
   app.appendChild(overlay);
+  const status = document.getElementById("feedbackStatus");
+  document.getElementById("copyFeedback").addEventListener("click", async () => {
+    const text = feedbackTextFromForm(overlay);
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = "Feedback copied to clipboard.";
+    } catch {
+      const fallback = document.createElement("textarea");
+      fallback.value = text;
+      document.body.appendChild(fallback);
+      fallback.select();
+      document.execCommand("copy");
+      fallback.remove();
+      status.textContent = "Feedback copied to clipboard.";
+    }
+  });
+  document.getElementById("downloadFeedback").addEventListener("click", () => {
+    downloadTextFile("sim-academia-3000-feedback.txt", feedbackTextFromForm(overlay));
+    status.textContent = "Feedback note downloaded.";
+  });
   document.getElementById("closeFeedback").addEventListener("click", () => overlay.remove());
 }
 

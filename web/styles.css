@@ -64,7 +64,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -143,14 +144,25 @@ button:disabled {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
-  min-height: 42px;
   border: 1px solid #b8c2cc;
   border-radius: 6px;
   background: #fff;
   color: var(--ink);
   padding: 8px 10px;
+}
+
+input,
+select {
+  min-height: 42px;
+}
+
+textarea {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.45;
 }
 
 .app-shell {
@@ -708,6 +720,39 @@ select {
 
 .feedback-questions li {
   margin-bottom: 6px;
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.feedback-field {
+  display: block;
+  margin-top: 12px;
+}
+
+.feedback-grid span,
+.feedback-field span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.feedback-status {
+  min-height: 22px;
+  margin: 12px 0 0;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .feedback-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .menu-modal h2 {
