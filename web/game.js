@@ -1,6 +1,5 @@
 const BUILD = "";
 const SAVE_KEY = "sim-academia-3000-save";
-const PLAYTEST_NOTE_KEY = "sim-academia-3000-playtest-note";
 
 const DOMAINS = {
   Mathematics: ["Algebraic Geometry", "Number Theory", "Dynamical Systems", "Probability Theory", "Partial Differential Equations", "Topology"],
@@ -404,7 +403,6 @@ function icon(name) {
   const paths = {
     menu: `<path d="M4 6h16M4 12h16M4 18h16"/>`,
     cv: `<path d="M5 4h9l5 5v11H5z"/><path d="M14 4v5h5"/><path d="M8 13h8M8 16h6"/>`,
-    feedback: `<path d="M21 12a8 8 0 0 1-8 8H7l-4 3v-7a8 8 0 1 1 18-4Z"/><path d="M8 10h8M8 14h5"/>`,
     save: `<path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4"/><path d="M8 16h8"/>`,
     load: `<path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/>`,
     new: `<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/>`,
@@ -914,180 +912,6 @@ function showMenuPanel() {
   });
 }
 
-function showPlaytesterNote() {
-  const overlay = document.createElement("div");
-  overlay.className = "modal-backdrop";
-  overlay.innerHTML = `
-    <section class="playtest-modal" role="dialog" aria-modal="true" aria-labelledby="playtestTitle">
-      <p class="panel-kicker">Playtest build</p>
-      <h2 id="playtestTitle">Before you begin</h2>
-      <div class="email-body">
-        <p>Please play one full academic career if you can. Do not try to optimize too hard on the first run; the game is meant to feel partly legible and partly unfair in the usual institutional way.</p>
-        <p>After playing, use the Feedback button to tell us where you felt delighted, confused, bored, cheated, or tempted to replay.</p>
-      </div>
-      <div class="actions">
-        <button id="openFeedbackFromNote">${buttonContent("feedback", "Feedback questions")}</button>
-        <button class="primary" id="closePlaytestNote">Begin</button>
-      </div>
-    </section>
-  `;
-  app.appendChild(overlay);
-  document.getElementById("closePlaytestNote").addEventListener("click", () => overlay.remove());
-  document.getElementById("openFeedbackFromNote").addEventListener("click", () => {
-    overlay.remove();
-    showFeedbackModal();
-  });
-}
-
-function maybeShowPlaytesterNote() {
-  if (sessionStorage.getItem(PLAYTEST_NOTE_KEY)) return;
-  sessionStorage.setItem(PLAYTEST_NOTE_KEY, "shown");
-  window.setTimeout(showPlaytesterNote, 100);
-}
-
-function currentRunSnapshot() {
-  if (!state.player) return "No career started yet.";
-  return [
-    `Year: ${state.year}/${state.yearLimit}`,
-    `Rank: ${state.player.rank}`,
-    `Institution: ${state.player.institution}`,
-    `Field: ${state.player.domain} / ${state.player.subdomain}`,
-    `Publications: ${state.publications.length}`,
-    `Citations: ${state.citations}`,
-    `Vanity items: ${state.vanity.length}`,
-    `Current screen: ${state.screen}`,
-  ].join("\n");
-}
-
-function feedbackTextFromForm(overlay) {
-  const value = (id) => overlay.querySelector(`#${id}`)?.value.trim() || "";
-  return [
-    "Sim Academia 3000 playtest feedback",
-    `Date: ${new Date().toISOString()}`,
-    `Browser URL: ${location.href}`,
-    "",
-    "Run snapshot",
-    currentRunSnapshot(),
-    "",
-    "Player",
-    value("feedbackName") || "(not provided)",
-    "",
-    "Approximate playtime",
-    value("feedbackPlaytime") || "(not provided)",
-    "",
-    "Was it fun?",
-    value("feedbackFun") || "(not answered)",
-    "",
-    "What felt clear or confusing?",
-    value("feedbackClarity") || "(not answered)",
-    "",
-    "Best moment",
-    value("feedbackBest") || "(not answered)",
-    "",
-    "Most frustrating or unfair moment",
-    value("feedbackFrustration") || "(not answered)",
-    "",
-    "Did you want to replay?",
-    value("feedbackReplay") || "(not answered)",
-    "",
-    "Bugs, UI pain, or text issues",
-    value("feedbackBugs") || "(not answered)",
-    "",
-    "One sentence verdict",
-    value("feedbackVerdict") || "(not answered)",
-  ].join("\n");
-}
-
-function downloadTextFile(filename, content) {
-  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
-
-function showFeedbackModal() {
-  const overlay = document.createElement("div");
-  overlay.className = "modal-backdrop";
-  overlay.innerHTML = `
-    <section class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
-      <p class="panel-kicker">Playtester feedback</p>
-      <h2 id="feedbackTitle">Tell us how it went</h2>
-      <p class="hint">No external account needed. Write freely, then copy or download the note and send it back however is easiest.</p>
-      <div class="feedback-grid">
-        <label>
-          <span>Name or initials, optional</span>
-          <input id="feedbackName" autocomplete="name" />
-        </label>
-        <label>
-          <span>Approximate playtime</span>
-          <input id="feedbackPlaytime" placeholder="e.g. 20 minutes, one full career..." />
-        </label>
-      </div>
-      <label class="feedback-field">
-        <span>Was it fun?</span>
-        <textarea id="feedbackFun" rows="3"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>What felt clear or confusing?</span>
-        <textarea id="feedbackClarity" rows="3"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>Best moment</span>
-        <textarea id="feedbackBest" rows="2"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>Most frustrating or unfair moment</span>
-        <textarea id="feedbackFrustration" rows="2"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>Did you want to replay?</span>
-        <textarea id="feedbackReplay" rows="2"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>Bugs, UI pain, or text issues</span>
-        <textarea id="feedbackBugs" rows="3"></textarea>
-      </label>
-      <label class="feedback-field">
-        <span>One sentence verdict</span>
-        <textarea id="feedbackVerdict" rows="2"></textarea>
-      </label>
-      <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
-      <div class="actions">
-        <button class="primary" id="copyFeedback">${buttonContent("feedback", "Copy feedback")}</button>
-        <button id="downloadFeedback">${buttonContent("save", "Download note")}</button>
-        <button id="closeFeedback">${buttonContent("close", "Close")}</button>
-      </div>
-    </section>
-  `;
-  app.appendChild(overlay);
-  const status = document.getElementById("feedbackStatus");
-  document.getElementById("copyFeedback").addEventListener("click", async () => {
-    const text = feedbackTextFromForm(overlay);
-    try {
-      await navigator.clipboard.writeText(text);
-      status.textContent = "Feedback copied to clipboard.";
-    } catch {
-      const fallback = document.createElement("textarea");
-      fallback.value = text;
-      document.body.appendChild(fallback);
-      fallback.select();
-      document.execCommand("copy");
-      fallback.remove();
-      status.textContent = "Feedback copied to clipboard.";
-    }
-  });
-  document.getElementById("downloadFeedback").addEventListener("click", () => {
-    downloadTextFile("sim-academia-3000-feedback.txt", feedbackTextFromForm(overlay));
-    status.textContent = "Feedback note downloaded.";
-  });
-  document.getElementById("closeFeedback").addEventListener("click", () => overlay.remove());
-}
-
 function generateTitle(subdomain) {
   const words = KEYWORDS[subdomain] || ["Models", "Frameworks", "Evidence", "Systems"];
   const a = rand(words);
@@ -1556,7 +1380,6 @@ function shell(content) {
           </div>
         </div>
         <button id="menuButton" class="sidebar-action">${buttonContent("menu", "Menu")}</button>
-        <button id="feedbackButton" class="sidebar-action">${buttonContent("feedback", "Feedback")}</button>
         ${stats.length ? `<div class="stat-list">
           ${stats.map(([k, v]) => `<div class="stat"><span>${k}</span><strong>${v}</strong></div>`).join("")}
         </div>` : ""}
@@ -1588,8 +1411,6 @@ function shell(content) {
   if (cvButton) cvButton.addEventListener("click", showCvModal);
   const menuButton = document.getElementById("menuButton");
   if (menuButton) menuButton.addEventListener("click", showMenuPanel);
-  const feedbackButton = document.getElementById("feedbackButton");
-  if (feedbackButton) feedbackButton.addEventListener("click", showFeedbackModal);
 }
 
 function renderProfile() {
@@ -3014,4 +2835,3 @@ function renderCurrentState() {
 }
 
 renderProfile();
-maybeShowPlaytesterNote();
