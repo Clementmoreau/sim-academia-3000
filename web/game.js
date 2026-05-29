@@ -1,7 +1,6 @@
 const BUILD = "";
 const SAVE_KEY = "sim-academia-3000-save";
 const PLAYTEST_NOTE_KEY = "sim-academia-3000-playtest-note";
-const LANGUAGE_KEY = "sim-academia-3000-language";
 const FEEDBACK_URL =
   "https://github.com/Clementmoreau/sim-academia-3000/issues/new?title=Playtest%20feedback&body=Browser%3A%0AApproximate%20playtime%3A%0A%0AWas%20it%20fun%3F%0A%0ADid%20you%20understand%20what%20you%20were%20trying%20to%20do%3F%0A%0ADid%20the%20hidden%20numbers%20feel%20funny%20or%20frustrating%3F%0A%0ABest%20moment%3A%0A%0AMost%20confusing%20moment%3A%0A%0ADid%20you%20want%20to%20replay%3F%0A%0AAny%20UI%20pain%3F%0A";
 
@@ -37,29 +36,6 @@ const INSTITUTIONS = [
   "São Paulo Federal Institute of Research",
   "Cape Town Institute of Technology",
   "Toronto Centre for Advanced Studies",
-];
-
-const FRENCH_INSTITUTIONS = [
-  "Université Paris-Cité",
-  "CNRS, UMR 7289",
-  "École normale supérieure de Lyon",
-  "Université Grenoble Alpes",
-  "Université Paris-Saclay",
-  "Institut Polytechnique de Paris",
-  "Université de Strasbourg",
-  "Université de Rennes",
-  "Aix-Marseille Université",
-  "Université de Montpellier",
-  "Université Toulouse III - Paul Sabatier",
-  "Université Claude Bernard Lyon 1",
-  "Sorbonne Université",
-  "Université de Lille",
-  "INRIA Saclay",
-  "Institut Curie",
-  "Muséum national d'Histoire naturelle",
-  "École des Ponts ParisTech",
-  "Université Côte d'Azur",
-  "Collège de France, chaire provisoire",
 ];
 
 const ACADEMIC_NAMES = [
@@ -280,19 +256,6 @@ const JOURNAL_TEMPLATES = [
   ["Annals of The Universal Society of {subdomain}", 10, 390],
 ];
 
-const JOURNAL_TEMPLATES_FR = [
-  ["Bulletin Confidentiel de {subdomain}", 1, 50],
-  ["Cahiers Préliminaires de {subdomain}", 2, 72],
-  ["Annales Régionales de {subdomain} Appliquée", 3, 94],
-  ["Revue des Directions Émergentes en {subdomain}", 4, 120],
-  ["Transactions Sérieuses de {subdomain}", 5, 152],
-  ["Revue Internationale des Méthodes en {subdomain}", 6, 192],
-  ["Annales Avancées de {subdomain}", 7, 240],
-  ["Frontières Théoriques de {subdomain}", 8, 280],
-  ["Comptes Rendus de l'Académie en {subdomain}", 9, 330],
-  ["Annales Universelles de {subdomain}", 10, 390],
-];
-
 const KEYWORDS = {
   "Algebraic Geometry": ["Moduli Spaces", "Derived Categories", "Sheaves", "Birational Maps"],
   "Number Theory": ["Automorphic Forms", "Prime Gaps", "Galois Representations", "L-functions"],
@@ -438,329 +401,6 @@ const state = {
 };
 
 const app = document.getElementById("app");
-
-const requestedLanguage = new URLSearchParams(location.search).get("lang");
-let language = requestedLanguage || localStorage.getItem(LANGUAGE_KEY) || "en";
-if (!["en", "fr"].includes(language)) language = "en";
-
-const FR_TEXT_REPLACEMENTS = [
-  ["Sim Academia 3000", "Sim Academia 3000"],
-  ["Researcher Profile", "Profil de chercheur"],
-  ["Set up the scholar who will brave grants, reviews, citations, and selective conferences.", "Créez le chercheur qui affrontera appels à projets, rapports d'expertise, citations et colloques sélectifs."],
-  ["Name", "Nom"],
-  ["Rank", "Grade"],
-  ["Institution", "Établissement"],
-  ["Field", "Domaine"],
-  ["Domain", "Discipline"],
-  ["Subdomain", "Spécialité"],
-  ["Year", "Année"],
-  ["Standing", "Notoriété"],
-  ["Experience", "Métier"],
-  ["Funds", "Crédits"],
-  ["Citations", "Citations"],
-  ["Random name", "Nom aléatoire"],
-  ["Random institution", "Établissement aléatoire"],
-  ["Start Career", "Commencer la carrière"],
-  ["Feedback", "Retours"],
-  ["Menu", "Menu"],
-  ["See my CV", "Voir mon CV"],
-  ["Departmental Notes", "Notes du département"],
-  ["Informal record", "Main courante"],
-  ["No departmental record yet.", "Rien à signaler pour l'instant."],
-  ["Before you begin", "Avant de commencer"],
-  ["Playtest build", "Version de test"],
-  ["Please play one full academic career if you can. Do not try to optimize too hard on the first run; the game is meant to feel partly legible and partly unfair in the usual institutional way.", "Essayez de jouer une carrière complète si possible. Ne cherchez pas trop à optimiser dès la première partie: le jeu est censé rester à moitié lisible, à moitié injuste, comme une vraie procédure institutionnelle."],
-  ["After playing, use the Feedback button to tell us where you felt delighted, confused, bored, cheated, or tempted to replay.", "Après la partie, utilisez le bouton Retours pour dire où vous avez été amusé, perdu, lassé, floué, ou tenté de relancer une carrière."],
-  ["Feedback questions", "Questions de test"],
-  ["Begin", "Commencer"],
-  ["Playtester feedback", "Retour de test"],
-  ["After one run", "Après une partie"],
-  ["Was it fun?", "Est-ce que c'était amusant ?"],
-  ["Did you understand what you were trying to do?", "Avez-vous compris ce que vous essayiez de faire ?"],
-  ["Did the hidden numbers feel funny or frustrating?", "Les chiffres cachés vous ont-ils semblé drôles ou frustrants ?"],
-  ["What was the best moment?", "Quel a été le meilleur moment ?"],
-  ["What was the most confusing moment?", "Quel a été le moment le plus confus ?"],
-  ["Did you want to replay?", "Avez-vous eu envie de rejouer ?"],
-  ["Any UI pain?", "Un inconfort d'interface ?"],
-  ["Leave feedback on GitHub", "Laisser un retour sur GitHub"],
-  ["Close", "Fermer"],
-  ["Game Menu", "Menu du jeu"],
-  ["New game", "Nouvelle partie"],
-  ["Save game", "Sauvegarder"],
-  ["Load game", "Charger"],
-  ["Save files are stored locally in this browser.", "Les sauvegardes restent dans ce navigateur."],
-  ["Appointment", "Nomination"],
-  ["Welcome to", "Bienvenue à"],
-  ["You just got a position at", "Vous venez d'obtenir un poste à"],
-  ["An exciting career awaits. Along the journey, you will try to publish papers in prestigious journals, apply for fancy grants, climb the academic ladder and reward yourself with vanity items that will make your colleagues jealous. For now, time to get to work in your office.", "Une carrière prometteuse vous attend. Au fil des années, vous tenterez de publier dans des revues prestigieuses, de décrocher des financements élégamment flous, de gravir les échelons académiques et de vous offrir des objets de vanité qui rendront vos collègues discrètement jaloux. Pour l'heure, il est temps de rejoindre votre bureau."],
-  ["Get to work", "Au travail"],
-  ["Funding Opportunities", "Appels à projets"],
-  ["Funding", "Financement"],
-  ["Apply until someone says yes, or skip and begin with whatever dignity remains.", "Candidatez jusqu'à ce que quelqu'un dise oui, ou passez votre tour avec la dignité disponible."],
-  ["Skip funding", "Renoncer au financement"],
-  ["Typical award:", "Type de financement :"],
-  ["Apply", "Candidater"],
-  ["Rejected", "Refusé"],
-  ["Allocation", "Répartition"],
-  ["Choose", "Choisir"],
-  ["Cost", "Coût"],
-  ["Lift", "Effet"],
-  ["Proceed without collaboration", "Continuer sans collaboration"],
-  ["Begin research", "Commencer la recherche"],
-  ["Choose one colleague to contact.", "Choisissez un collègue à contacter."],
-  ["Contact them", "Les contacter"],
-  ["Contacted", "Contacté"],
-  ["Research", "Recherche"],
-  ["New Draft", "Nouveau manuscrit"],
-  ["Current draft condition:", "État actuel du manuscrit :"],
-  ["Continue research", "Continuer la recherche"],
-  ["Finish research", "Terminer la recherche"],
-  ["Research Log", "Carnet de recherche"],
-  ["Draft condition:", "État du manuscrit :"],
-  ["Research has not started yet.", "La recherche n'a pas encore commencé."],
-  ["Research progress", "Progression de la recherche"],
-  ["Submission", "Soumission"],
-  ["Select a Journal", "Choisir une revue"],
-  ["Journal", "Revue"],
-  ["Fit", "Adéquation"],
-  ["Submit", "Soumettre"],
-  ["Overkill", "Trop bas"],
-  ["Safe", "Prudent"],
-  ["Best fit", "Bon ajustement"],
-  ["Risky", "Risqué"],
-  ["High risk", "Très risqué"],
-  ["Very safe, but the career payoff will be tiny.", "Très sûr, mais le bénéfice de carrière sera minuscule."],
-  ["Likely to work, with modest career payoff.", "Probable, avec un gain de carrière modeste."],
-  ["Balanced risk and reward.", "Risque et bénéfice bien équilibrés."],
-  ["Harder to publish, but valuable if it lands.", "Plus difficile, mais rentable si cela passe."],
-  ["Unlikely, but potentially career-making.", "Peu probable, mais potentiellement décisif."],
-  ["Revision", "Révision"],
-  ["Revision Progress", "Progression de la révision"],
-  ["Work on revision", "Travailler la révision"],
-  ["Submit revision", "Soumettre la révision"],
-  ["Accepted", "Accepté"],
-  ["Rejected", "Refusé"],
-  ["Decision on your grant application", "Décision concernant votre demande de financement"],
-  ["Decision on your manuscript", "Décision concernant votre manuscrit"],
-  ["Final decision on your revised manuscript", "Décision finale concernant votre manuscrit révisé"],
-  ["Decision", "Décision"],
-  ["End year", "Clore l'année"],
-  ["Annual Report", "Rapport annuel"],
-  ["Internal memorandum", "Note interne"],
-  ["Office of Academic Affairs", "Direction des affaires académiques"],
-  ["Project", "Projet"],
-  ["Outcome:", "Résultat :"],
-  ["Funding:", "Financement :"],
-  ["New Citations", "Nouvelles citations"],
-  ["Total citations:", "Citations totales :"],
-  ["Dean's Note", "Mot de la direction"],
-  ["Career momentum:", "Dynamique de carrière :"],
-  ["Distinctions", "Distinctions"],
-  ["Acquire", "Obtenir"],
-  ["Owned", "Acquis"],
-  ["Locked", "Verrouillé"],
-  ["Next year", "Année suivante"],
-  ["Finish career", "Terminer la carrière"],
-  ["Five Years Remaining", "Encore cinq ans"],
-  ["The final stretch begins", "La dernière ligne droite commence"],
-  ["The department has quietly started using the word “legacy.” Five years remain before retirement, which is long enough to reshape a career and short enough for every decision to look intentional.", "Le département commence discrètement à employer le mot « héritage ». Il reste cinq ans avant la retraite: assez pour infléchir une carrière, trop peu pour faire semblant que les décisions sont innocentes."],
-  ["Confidential note", "Note confidentielle"],
-  ["Begin the final five years", "Entamer les cinq dernières années"],
-  ["International Congress", "Congrès international"],
-  ["Congress Season", "Saison des congrès"],
-  ["The four-year cycle has turned. The field gathers, performs confidence, and asks questions disguised as comments.", "Le cycle quadriennal revient. Le champ se rassemble, affiche sa confiance, et pose des questions qui ressemblent beaucoup à des commentaires."],
-  ["Start the conference", "Commencer le congrès"],
-  ["Congress Talks", "Sessions du congrès"],
-  ["Which talk will you go to?", "À quelles communications assister ?"],
-  ["Choose two sessions. Professional consequences often begin as ordinary conversations.", "Choisissez deux sessions. Les conséquences professionnelles commencent souvent comme des conversations ordinaires."],
-  ["Talks attended", "Communications suivies"],
-  ["No talks attended yet.", "Aucune communication suivie pour l'instant."],
-  ["talks attended.", "communications suivies."],
-  ["Listen silently and take notes", "Écouter en silence et prendre des notes"],
-  ["Ask a question", "Poser une question"],
-  ["Go chat after the talk", "Aller discuter après la communication"],
-  ["Your Presentation", "Votre communication"],
-  ["Time for your presentation", "C'est à vous de présenter"],
-  ["Give a technical but obscure talk", "Faire une présentation technique mais opaque"],
-  ["Give an inspirational but vague talk", "Faire une présentation inspirante mais vague"],
-  ["Present", "Présenter"],
-  ["Congress Complete", "Congrès terminé"],
-  ["Already the end of the congress", "Déjà la fin du congrès"],
-  ["Go back home", "Rentrer au laboratoire"],
-  ["Retirement", "Retraite"],
-  ["The career reaches its final committee meeting", "La carrière atteint sa dernière commission"],
-  ["Retire", "Prendre sa retraite"],
-  ["Career Complete", "Carrière terminée"],
-  ["Retirement Recap", "Bilan de retraite"],
-  ["Publications", "Publications"],
-  ["Final rank", "Grade final"],
-  ["Global Colleague Ranking", "Classement global des collègues"],
-  ["Capstone Achievements", "Dernières consécrations"],
-  ["Career Timeline", "Chronologie de carrière"],
-  ["Start a new career", "Commencer une nouvelle carrière"],
-  ["Assistant Professor", "Maître de conférences"],
-  ["Associate Professor", "Professeur associé"],
-  ["Full Professor", "Professeur des universités"],
-  ["Prof.", "Pr."],
-  ["Dr.", "Dr"],
-  ["microgrant", "micro-financement"],
-  ["small grant", "petit financement"],
-  ["major grant", "gros financement"],
-  ["prestige grant", "financement de prestige"],
-  ["transformative award", "grand programme transformant"],
-  ["field-shaping", "structurant pour le champ"],
-  ["widely visible", "très visible"],
-  ["recognized", "reconnu"],
-  ["emerging", "émergent"],
-  ["locally noticed", "repéré localement"],
-  ["precariously obscure", "précairement obscur"],
-  ["battle-hardened", "rompu aux commissions"],
-  ["seasoned", "aguerri"],
-  ["confident", "à l'aise"],
-  ["developing", "en rodage"],
-  ["newbie", "tout juste recruté"],
-  ["exceptionally polished", "exceptionnellement poli"],
-  ["formidable", "formidable"],
-  ["very strong", "très solide"],
-  ["promising", "prometteur"],
-  ["preliminary", "préliminaire"],
-  ["shameful", "indéfendable"],
-  ["transformative", "transformant"],
-  ["major", "majeur"],
-  ["strong", "solide"],
-  ["useful", "utile"],
-  ["modest", "modeste"],
-  ["tiny", "minuscule"],
-  ["none", "aucun"],
-  ["Department Funds Last Scraps", "Reliquats du département"],
-  ["Local Symposium Microgrant", "Micro-crédit de séminaire local"],
-  ["Regional Kickoff Grant Council", "Conseil régional d'amorçage scientifique"],
-  ["Society for Support of Incremental Discoveries", "Société de soutien aux découvertes incrémentales"],
-  ["National Institute for Consolidating Avant-Garde Research", "Agence nationale pour la consolidation de l'avant-garde"],
-  ["Mid-Career Research Endowment Agency", "Fondation pour carrières déjà bien installées"],
-  ["Foundation for Transformative and Transdisciplinary Research", "Fondation pour la recherche transformative et transdisciplinaire"],
-  ["The Royal Society of Excellent Epistemic Endeavors", "Société royale des excellentes entreprises épistémiques"],
-  ["International Cutting Edge Council", "Conseil international du très haut niveau"],
-  ["World Human Frontier Prestige Advanced Fellowship", "Bourse mondiale des frontières humaines et du prestige avancé"],
-  ["DFLS", "RDL"],
-  ["LSM", "MSL"],
-  ["RKGC", "CRAS"],
-  ["SSID", "SSDI"],
-  ["NICAR", "ANCA"],
-  ["MCREA", "FCDI"],
-  ["FTTR", "FRTT"],
-  ["RSEEE", "SREEE"],
-  ["ICEC", "CITHN"],
-  ["WHFPAF", "BMFP"],
-  ["Mathematics", "Mathématiques"],
-  ["Physics", "Physique"],
-  ["Chemistry", "Chimie"],
-  ["Control Theory", "Automatique"],
-  ["Engineering", "Ingénierie"],
-  ["Biology", "Biologie"],
-  ["Computer Science", "Informatique"],
-  ["Economics", "Économie"],
-  ["Algebraic Geometry", "Géométrie algébrique"],
-  ["Number Theory", "Théorie des nombres"],
-  ["Dynamical Systems", "Systèmes dynamiques"],
-  ["Probability Theory", "Probabilités"],
-  ["Partial Differential Equations", "Équations aux dérivées partielles"],
-  ["Topology", "Topologie"],
-  ["Soft Matter Physics", "Physique de la matière molle"],
-  ["Astrophysics", "Astrophysique"],
-  ["Quantum Mechanics", "Mécanique quantique"],
-  ["Condensed Matter Physics", "Physique de la matière condensée"],
-  ["Particle Physics", "Physique des particules"],
-  ["Statistical Mechanics", "Mécanique statistique"],
-  ["Organic Synthesis", "Synthèse organique"],
-  ["Physical Chemistry", "Chimie physique"],
-  ["Materials Chemistry", "Chimie des matériaux"],
-  ["Catalysis", "Catalyse"],
-  ["Chemical Biology", "Biologie chimique"],
-  ["Electrochemistry", "Électrochimie"],
-  ["Robust Control", "Commande robuste"],
-  ["Optimal Control", "Commande optimale"],
-  ["Nonlinear Systems", "Systèmes non linéaires"],
-  ["Lyapunov Functions", "Fonctions de Lyapunov"],
-  ["Feedback Linearization", "Linéarisation par retour d'état"],
-  ["Limit Cycles", "Cycles limites"],
-  ["Observer Design", "Synthèse d'observateurs"],
-  ["Networked Control", "Commande en réseau"],
-  ["Stochastic Control", "Commande stochastique"],
-  ["Model Predictive Control", "Commande prédictive"],
-  ["Mechanical Engineering", "Génie mécanique"],
-  ["Electrical Engineering", "Génie électrique"],
-  ["Civil Engineering", "Génie civil"],
-  ["Aerospace Engineering", "Aéronautique"],
-  ["Biomedical Engineering", "Génie biomédical"],
-  ["Robotics", "Robotique"],
-  ["Molecular Biology", "Biologie moléculaire"],
-  ["Gene Networks", "Réseaux de gènes"],
-  ["Metabolic Flux", "Flux métaboliques"],
-  ["Feedback Motifs", "Boucles de rétroaction"],
-  ["Cellular Heterogeneity", "Hétérogénéité cellulaire"],
-  ["Genetics", "Génétique"],
-  ["Ecology", "Écologie"],
-  ["Neuroscience", "Neurosciences"],
-  ["Evolutionary Biology", "Biologie évolutive"],
-  ["Systems Biology", "Biologie des systèmes"],
-  ["AI", "IA"],
-  ["HCI", "IHM"],
-  ["User Experience", "Expérience utilisateur"],
-  ["Tactile Feedback", "Retour tactile"],
-  ["Interface Design", "Design d'interfaces"],
-  ["Cognitive Load", "Charge cognitive"],
-  ["Data Science", "Science des données"],
-  ["Programming Languages", "Langages de programmation"],
-  ["Distributed Systems", "Systèmes distribués"],
-  ["Computer Vision", "Vision par ordinateur"],
-  ["Cybersecurity", "Cybersécurité"],
-  ["Behavioral Economics", "Économie comportementale"],
-  ["Macroeconomics", "Macroéconomie"],
-  ["Financial Economics", "Économie financière"],
-  ["Industrial Organization", "Organisation industrielle"],
-  ["Econometrics", "Économétrie"],
-];
-
-function isFrench() {
-  return language === "fr";
-}
-
-function tx(en, fr) {
-  return isFrench() ? fr : en;
-}
-
-function setLanguage(nextLanguage) {
-  language = nextLanguage;
-  localStorage.setItem(LANGUAGE_KEY, language);
-  renderCurrentState();
-}
-
-function localizeText(text) {
-  if (!isFrench() || !text) return text;
-  return FR_TEXT_REPLACEMENTS
-    .sort((a, b) => b[0].length - a[0].length)
-    .reduce((current, [en, fr]) => current.split(en).join(fr), text);
-}
-
-function localizeDom(root) {
-  if (!isFrench()) return;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-  nodes.forEach((node) => {
-    node.nodeValue = localizeText(node.nodeValue);
-  });
-}
-
-function displayInstitutionPool() {
-  return isFrench() ? FRENCH_INSTITUTIONS : INSTITUTIONS;
-}
-
-function feedbackUrl() {
-  if (!isFrench()) return FEEDBACK_URL;
-  return "https://github.com/Clementmoreau/sim-academia-3000/issues/new?title=Retour%20de%20test&body=Navigateur%20%3A%0ADur%C3%A9e%20approximative%20%3A%0A%0AEst-ce%20que%20c'%C3%A9tait%20amusant%20%3F%0A%0AAvez-vous%20compris%20ce%20que%20vous%20essayiez%20de%20faire%20%3F%0A%0ALes%20chiffres%20cach%C3%A9s%20vous%20ont-ils%20sembl%C3%A9%20dr%C3%B4les%20ou%20frustrants%20%3F%0A%0AMeilleur%20moment%20%3A%0A%0AMoment%20le%20plus%20confus%20%3A%0A%0AAvez-vous%20eu%20envie%20de%20rejouer%20%3F%0A%0AInconfort%20d'interface%20%3F%0A";
-}
 
 function icon(name) {
   const paths = {
@@ -1011,23 +651,6 @@ function publicationMetadata(journalPrestige) {
 }
 
 function fundingEmail(funder, grant, accepted) {
-  const funderName = localizeText(funder.name);
-  if (isFrench()) {
-    if (accepted) {
-      return oneOf([
-        `Chère/Cher ${state.player.name},\n\nJ'ai le plaisir de vous informer que votre demande auprès de ${funderName} a été retenue. Le comité a apprécié la netteté apparente de la question scientifique et la façon très assurée dont vous annoncez des résultats livrables.\n\nLe montant attribué est de $${grant}. Merci d'en faire un usage qui puisse, au moins dans un rapport d'activité, être qualifié de structurant.\n\nBien cordialement,\nLe comité de sélection`,
-        `Chère/Cher ${state.player.name},\n\nAprès examen de votre dossier, ${funderName} a décidé de soutenir votre projet. Les rapporteurs ont jugé l'ensemble ambitieux, lisible, et suffisamment risqué pour donner à la commission l'impression de financer l'avenir.\n\nL'aide accordée s'élève à $${grant}. Nous attendons avec intérêt l'article, le rapport, la conférence invitée ou la rumeur institutionnelle qui en résultera.\n\nBien à vous,\nLe secrétariat scientifique`,
-        `Chère/Cher ${state.player.name},\n\nVotre projet a survécu à la discussion de panel, aux arbitrages budgétaires et à une objection méthodologique particulièrement longue. Nous sommes donc heureux de vous attribuer un financement de ${funderName}.\n\nLe montant total de l'aide est de $${grant}. Merci de mentionner le financeur dans toutes les productions issues du projet, surtout celles qui vieillissent bien.\n\nCordialement,\nLe bureau des appels à projets`,
-      ]);
-    }
-
-    return oneOf([
-      `Chère/Cher ${state.player.name},\n\nNous vous remercions pour votre candidature auprès de ${funderName}. Après examen attentif, nous avons le regret de vous informer que votre projet ne pourra pas être financé lors de cette campagne.\n\nLe comité a relevé l'intérêt de la proposition, sans toutefois la juger suffisamment prioritaire au regard de la concurrence actuelle. Nous vous encourageons à déposer à nouveau lorsque le moral sera revenu.\n\nBien cordialement,\nLe comité de sélection`,
-      `Chère/Cher ${state.player.name},\n\nNous avons lu avec attention votre dossier soumis à ${funderName}. Malheureusement, la proposition n'a pas été retenue pour financement.\n\nLes rapporteurs soulignent une promesse intellectuelle réelle, tout en formulant des réserves familières : faisabilité, périmètre, impact, et une légère incertitude sur la définition du mot impact.\n\nCordialement,\nLe secrétariat scientifique`,
-      `Chère/Cher ${state.player.name},\n\nLa commission a terminé l'évaluation de votre demande auprès de ${funderName}. Nous regrettons de ne pas pouvoir vous attribuer de crédits cette année.\n\nCette décision reflète principalement des moyens limités et un champ très encombré, et non nécessairement la valeur de long terme de votre idée.\n\nSincèrement,\nLe bureau des appels à projets`,
-    ]);
-  }
-
   if (accepted) {
     return oneOf([
       `Dear ${state.player.name},\n\nI am pleased to inform you that ${funder.name} has selected your proposal for funding. The panel appreciated the clarity of the research question and the unnerving confidence with which you promised deliverables.\n\nThe award amount is $${grant}. Please use it in ways that can plausibly be described as transformative.\n\nSincerely,\nThe Grants Committee`,
@@ -1156,25 +779,24 @@ function showEmailModal({ from, subject, body, onContinue, secondary }) {
     <section class="email-modal" role="dialog" aria-modal="true" aria-labelledby="emailSubject">
       <div class="email-header">
         <div>
-          <span class="email-label">${tx("From", "De")}</span>
+          <span class="email-label">From</span>
           <strong>${from}</strong>
         </div>
         <div>
-          <span class="email-label">${tx("Subject", "Objet")}</span>
-          <h2 id="emailSubject">${localizeText(subject)}</h2>
+          <span class="email-label">Subject</span>
+          <h2 id="emailSubject">${subject}</h2>
         </div>
       </div>
       <div class="email-body">
         ${body.split("\n").map((paragraph) => `<p>${paragraph}</p>`).join("")}
       </div>
       <div class="actions">
-        ${secondary ? `<button id="secondaryEmail">${localizeText(secondary.label)}</button>` : ""}
-        <button class="primary" id="continueEmail">${tx("Continue", "Continuer")}</button>
+        ${secondary ? `<button id="secondaryEmail">${secondary.label}</button>` : ""}
+        <button class="primary" id="continueEmail">Continue</button>
       </div>
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("continueEmail").addEventListener("click", () => {
     overlay.remove();
     onContinue();
@@ -1261,7 +883,6 @@ function showCvModal() {
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closeCv").addEventListener("click", () => overlay.remove());
 }
 
@@ -1281,7 +902,6 @@ function showMenuPanel() {
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closeMenuButton").addEventListener("click", () => overlay.remove());
   document.getElementById("newGameButton").addEventListener("click", () => {
     if (confirm("Start a new game? Unsaved progress will be lost.")) newGame();
@@ -1314,7 +934,6 @@ function showPlaytesterNote() {
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closePlaytestNote").addEventListener("click", () => overlay.remove());
   document.getElementById("openFeedbackFromNote").addEventListener("click", () => {
     overlay.remove();
@@ -1345,13 +964,12 @@ function showFeedbackModal() {
         <li>Any UI pain?</li>
       </ol>
       <div class="actions">
-        <a class="button-link primary" href="${feedbackUrl()}" target="_blank" rel="noopener">Leave feedback on GitHub</a>
+        <a class="button-link primary" href="${FEEDBACK_URL}" target="_blank" rel="noopener">Leave feedback on GitHub</a>
         <button id="closeFeedback">${buttonContent("close", "Close")}</button>
       </div>
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closeFeedback").addEventListener("click", () => overlay.remove());
 }
 
@@ -1365,28 +983,6 @@ function generateTitle(subdomain) {
   const method = rand(["Bayesian", "Geometric", "Experimental", "Computational", "Asymptotic", "Network", "Multiscale", "Causal"]);
   const object = rand(["Evidence", "Models", "Mechanisms", "Constraints", "Fluctuations", "Interfaces", "Dynamics", "Benchmarks"]);
   const claim = rand(["Hidden Regularities", "Unexpected Failures", "Robust Signatures", "Sharp Bounds", "Emergent Structure", "Fragile Universality"]);
-  if (isFrench()) {
-    const fa = localizeText(a);
-    const fb = localizeText(b);
-    const field = localizeText(subdomain);
-    return rand([
-      `${fa} et ${fb}: contribution à une théorie raisonnablement générale`,
-      `Sur le rôle de ${fa} en ${field}`,
-      `Revisiter ${fa}: conséquences pour ${localizeText(rand(words))}`,
-      `${fa} contre ${fb}: éléments d'un débat technique`,
-      `Pourquoi ${fa} compte encore en ${field}`,
-      `Méthodes computationnelles pour ${fa} en ${field}`,
-      `La structure cachée de ${fa}`,
-      `Quand ${fa} échoue: leçons tirées de ${fb}`,
-      `Théorie minimale de ${fa} et ${fb}`,
-      `De ${fa} à ${fb}: étude comparative`,
-      `Mesurer ${fa} sans céder entièrement à l'enthousiasme`,
-      `Résultats négatifs sur ${fa} et conséquences pour ${fb}`,
-      `Petit guide de ${fa}, ${fb} et prudence savante`,
-      `Lois d'échelle pour ${fa} sous hypothèses acceptables`,
-      `Ce que ${fb} révèle de ${fa}`,
-    ]);
-  }
   const patterns = [
     `${a} and ${b}: A Novel Approach to ${rand(words)}`,
     `On the Role of ${a} in ${rand(words)}`,
@@ -1409,9 +1005,8 @@ function generateTitle(subdomain) {
 }
 
 function journals() {
-  const templates = isFrench() ? JOURNAL_TEMPLATES_FR : JOURNAL_TEMPLATES;
-  return templates.map(([template, prestige, threshold]) => ({
-    name: template.replace("{subdomain}", localizeText(state.player.subdomain)),
+  return JOURNAL_TEMPLATES.map(([template, prestige, threshold]) => ({
+    name: template.replace("{subdomain}", state.player.subdomain),
     prestige,
     threshold: threshold + Math.floor(Math.random() * 11) - 5,
     scope: journalScope(prestige, state.player.subdomain),
@@ -1419,22 +1014,6 @@ function journals() {
 }
 
 function journalScope(prestige, subdomain) {
-  if (isFrench()) {
-    const field = localizeText(subdomain);
-    const scopes = {
-      1: `Une revue assez conciliante pour premiers résultats en ${field}. Elle accepte les manuscrits compacts, les preuves préliminaires et les idées qui tiennent debout avec une main sur le mur.`,
-      2: `Un support régional, discret mais réel, pour contributions modestes en ${field}. La rédaction demande surtout des affirmations lisibles, des méthodes reconnaissables et pas trop d'effets de manche statistiques.`,
-      3: `Une revue pratique pour travaux incrémentaux, exemples propres et discussion compétente. En ${field}, mieux vaut résoudre une petite question correctement que promettre une révolution.`,
-      4: `Une revue attentive aux directions émergentes en ${field}. Elle aime les angles neufs, le positionnement prudent et les papiers capables de survivre à un scepticisme ordinaire.`,
-      5: `Une revue technique solide, avec comités sérieux et rapports parfois utiles. Le manuscrit doit avoir une méthode convaincante, assez de validation et quelque chose que les spécialistes peuvent réutiliser.`,
-      6: `Une revue internationale sélective, lue au-delà du cercle immédiat. Le papier doit être poli, bien situé, et assez robuste pour que les rapporteurs discutent l'importance plutôt que la compétence.`,
-      7: `Un lieu prestigieux pour contributions ambitieuses en ${field}. Il faut de la clarté conceptuelle, des preuves solides et un résultat qui modifie légèrement la façon dont le champ se raconte.`,
-      8: `Une revue théorique à haute tension, où même les bons papiers arrivent un peu mal habillés. Il faut de l'élégance, de la profondeur technique et une thèse qui voyage au-delà de la sous-communauté.`,
-      9: `Une revue de rang académique presque cérémoniel. Le manuscrit doit avoir l'air évident après publication et impossible avant.`,
-      10: `Un débouché quasi mythologique pour contributions qui redessinent la carte, agacent des gens importants et génèrent des invitations pendant des années.`,
-    };
-    return scopes[prestige];
-  }
   const scopes = {
     1: `A forgiving venue for early reports in ${subdomain}. The journal welcomes compact manuscripts, preliminary evidence, and ideas that are still learning how to stand upright.`,
     2: `A regional specialist outlet for modest but coherent contributions to ${subdomain}. The editors mainly want readable claims, recognizable methods, and no statistical pyrotechnics.`,
@@ -1588,7 +1167,7 @@ function generateColleagues(includePlayer = false) {
     return {
       id: `colleague-${index}-${score}`,
       name: academicDisplayName(names[index % names.length], rank),
-      institution: rand(displayInstitutionPool()),
+      institution: rand(INSTITUTIONS),
       field: `${rand(Object.keys(DOMAINS))}`,
       rank,
       reputation,
@@ -1680,7 +1259,6 @@ function showColleaguesModal() {
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closeColleagues").addEventListener("click", () => overlay.remove());
 }
 
@@ -1691,22 +1269,6 @@ function collaborationOffer(colleague) {
   const friendQuality = colleague.friend ? 3 : 0;
 
   if (gap < -60) {
-    if (isFrench()) {
-      return {
-        kind: "lower",
-        chance: clamp(0.9 + friendBonus, 0, 0.98),
-        bonus: 5 + friendQuality,
-        malus: 1,
-        acceptedSubject: "Re: collaboration possible",
-        acceptedBody: oneOf([
-          `Chère/Cher ${state.player.name},\n\nMerci beaucoup pour votre message. Je serais très heureuse/heureux de contribuer au projet, et je peux préparer quelques notes dès cette semaine.\n\nJe vous remercie de m'avoir proposé cette collaboration. Je ferai de mon mieux pour qu'elle soit utile.\n\nBien cordialement,\n${colleague.name}`,
-          `Chère/Cher ${state.player.name},\n\nC'est une excellente nouvelle. Je suis vos travaux récents avec intérêt et je serais ravi(e) de participer au cadrage, aux figures ou aux analyses complémentaires.\n\nEnvoyez-moi le manuscrit quand cela vous arrange.\n\nBien à vous,\n${colleague.name}`,
-          `Chère/Cher ${state.player.name},\n\nJ'accepte volontiers. Le projet rejoint des questions que j'avais envie d'aborder depuis longtemps, et je peux dégager un peu de temps ce semestre.\n\nAvec tous mes remerciements,\n${colleague.name}`,
-        ]),
-        rejectedSubject: "Re: collaboration possible",
-        rejectedBody: `Chère/Cher ${state.player.name},\n\nMerci beaucoup d'avoir pensé à moi. Je suis sincèrement flatté(e), mais je suis déjà trop engagé(e) cette année pour contribuer sérieusement.\n\nJ'espère que nous trouverons bientôt une autre occasion.\n\nBien cordialement,\n${colleague.name}`,
-      };
-    }
     return {
       kind: "lower",
       chance: clamp(0.9 + friendBonus, 0, 0.98),
@@ -1724,25 +1286,6 @@ function collaborationOffer(colleague) {
   }
 
   if (Math.abs(gap) <= 60) {
-    if (isFrench()) {
-      return {
-        kind: "peer",
-        chance: clamp(0.5 + friendBonus, 0, 0.95),
-        bonus: 10 + friendQuality,
-        malus: 0,
-        acceptedSubject: "Re: collaboration possible",
-        acceptedBody: oneOf([
-          `Chère/Cher ${state.player.name},\n\nMerci pour votre message. J'ai lu vos travaux récents avec beaucoup d'intérêt, et nos approches me semblent pouvoir dialoguer proprement.\n\nEssayons une collaboration ciblée sur votre prochain article. Je peux contribuer au cadrage, à quelques idées techniques, et à cette forme de calme qui rend parfois les rapporteurs moins hostiles.\n\nBien à vous,\n${colleague.name}`,
-          `Chère/Cher ${state.player.name},\n\nLe projet me paraît prometteur. Je tourne autour de questions proches, et un article commun serait peut-être la manière la plus nette d'avancer.\n\nCollaborons, à condition de garder un périmètre discipliné.\n\nBien cordialement,\n${colleague.name}`,
-          `Chère/Cher ${state.player.name},\n\nMerci pour l'invitation. Le projet me semble être un bon ajustement intellectuel, et je pense pouvoir renforcer l'argument.\n\nVous pouvez compter sur moi.\n\nBien à vous,\n${colleague.name}`,
-        ]),
-        rejectedSubject: "Re: collaboration possible",
-        rejectedBody: oneOf([
-          `Chère/Cher ${state.player.name},\n\nMerci pour votre proposition. Le projet paraît solide, mais mon calendrier est exceptionnellement serré cette année, et je préfère refuser plutôt que devenir le coauteur absent dont tout le monde parle à demi-mot.\n\nBien cordialement,\n${colleague.name}`,
-          `Chère/Cher ${state.player.name},\n\nMerci d'avoir pensé à moi. Je crains de ne pas pouvoir accepter une nouvelle collaboration sans la faire mal.\n\nJe vous souhaite pleine réussite pour l'article.\n\nBien à vous,\n${colleague.name}`,
-        ]),
-      };
-    }
     return {
       kind: "peer",
       chance: clamp(0.5 + friendBonus, 0, 0.95),
@@ -1763,26 +1306,6 @@ function collaborationOffer(colleague) {
   }
 
   const veryHigh = gap > 220;
-  if (isFrench()) {
-    return {
-      kind: veryHigh ? "veryHigh" : "higher",
-      chance: clamp((veryHigh ? 0.1 : 0.3) + friendBonus, 0, 0.9),
-      bonus: (veryHigh ? 18 : 14) + friendQuality,
-      malus: 0,
-      acceptedSubject: "Re: collaboration possible",
-      acceptedBody: oneOf([
-        `Chère/Cher ${state.player.name},\n\nJe comprends pourquoi vous m'avez écrit. Le projet n'est pas sans intérêt, et avec un encadrement attentif il pourrait devenir publiable dans une revue sérieuse.\n\nJe veux bien collaborer, à condition de maintenir un niveau d'exigence élevé.\n\nCordialement,\n${colleague.name}`,
-        `Chère/Cher ${state.player.name},\n\nVotre proposition est encore rugueuse, mais elle contient quelque chose. Je suis prêt(e) à participer si nous renforçons nettement la thèse centrale et si nous évitons toute impression de provincialisme.\n\nAvançons prudemment.\n\nCordialement,\n${colleague.name}`,
-        `Chère/Cher ${state.player.name},\n\nJe ne prends pas souvent des projets à ce stade, mais il y a une idée ici. Je peux contribuer si nous restons disciplinés et ambitieux sur la revue cible.\n\nCordialement,\n${colleague.name}`,
-      ]),
-      rejectedSubject: "Re: collaboration possible",
-      rejectedBody: oneOf([
-        `Chère/Cher ${state.player.name},\n\nMerci pour votre message. Je reçois beaucoup d'invitations de ce type, et je dois être sélectif/sélective quant aux projets qui prolongent réellement mon programme de recherche actuel.\n\nJe ne pense pas que ce manuscrit soit le bon cadre.\n\nCordialement,\n${colleague.name}`,
-        `Chère/Cher ${state.player.name},\n\nJ'ai parcouru rapidement le plan. Il me semble mieux adapté à une autre collaboration, peut-être avec quelqu'un disposant de davantage de temps pour un travail exploratoire.\n\nBonne continuation,\n${colleague.name}`,
-        `Chère/Cher ${state.player.name},\n\nÀ ce stade, je ne vois pas de raison suffisamment forte pour associer mon nom au projet. J'espère que vous trouverez un coauteur plus approprié.\n\nCordialement,\n${colleague.name}`,
-      ]),
-    };
-  }
   return {
     kind: veryHigh ? "veryHigh" : "higher",
     chance: clamp((veryHigh ? 0.1 : 0.3) + friendBonus, 0, 0.9),
@@ -1825,9 +1348,7 @@ function contactCollaborationCandidate(colleague) {
       from: `${colleague.name} <collaboration@university.example>`,
       subject: colleague.friend ? "Of course, let us do this" : offer.acceptedSubject,
       body: colleague.friend
-        ? isFrench()
-          ? `Chère/Cher ${state.player.name},\n\nBien sûr. C'était vraiment agréable d'échanger au congrès, et je serais très heureux/heureuse de construire quelque chose avec vous cette année.\n\nEnvoyez-moi le manuscrit quand vous pouvez. Je le lirai avec l'attention qu'il mérite.\n\nTrès cordialement,\n${colleague.name}`
-          : `Dear ${state.player.name},\n\nOf course. It was good to talk at the congress, and I would be very happy to build something together this year.\n\nSend me the draft when you can. I will read it with the attention it deserves.\n\nWarmly,\n${colleague.name}`
+        ? `Dear ${state.player.name},\n\nOf course. It was good to talk at the congress, and I would be very happy to build something together this year.\n\nSend me the draft when you can. I will read it with the attention it deserves.\n\nWarmly,\n${colleague.name}`
         : offer.acceptedBody,
       onContinue: () => {
         log(`${colleague.name} joins the project. The draft suddenly has better posture.`, "good");
@@ -1845,9 +1366,7 @@ function contactCollaborationCandidate(colleague) {
     from: `${colleague.name} <collaboration@university.example>`,
     subject: colleague.friend ? "Re: collaboration this year" : offer.rejectedSubject,
     body: colleague.friend
-      ? isFrench()
-        ? `Chère/Cher ${state.player.name},\n\nJe suis sincèrement désolé(e), mais ce semestre est devenu administrativement déraisonnable. Je ne peux pas rejoindre le projet sans devenir inutile pour vous.\n\nN'hésitez pas à me redemander une autre fois. J'aimerais que nous trouvions le bon moment.\n\nTrès cordialement,\n${colleague.name}`
-        : `Dear ${state.player.name},\n\nI am genuinely sorry, but this semester has become administratively overcommitted. I cannot join the project without becoming useless to you.\n\nPlease do ask again another time. I would like us to find the right occasion.\n\nWarmly,\n${colleague.name}`
+      ? `Dear ${state.player.name},\n\nI am genuinely sorry, but this semester has become administratively overcommitted. I cannot join the project without becoming useless to you.\n\nPlease do ask again another time. I would like us to find the right occasion.\n\nWarmly,\n${colleague.name}`
       : offer.rejectedBody,
     onContinue: () => {
       log(`${colleague.name} declines the collaboration.`, "warn");
@@ -1860,9 +1379,7 @@ function warnOverenthusiasticCollaborator(colleague) {
   showEmailModal({
     from: "Your Inner Career Strategist <do-not-ignore@self.example>",
     subject: "Are you sure about this collaborator?",
-    body: isFrench()
-      ? `Chère/Cher ${state.player.name},\n\nCette collaboration semble nettement déséquilibrée en votre défaveur symbolique. La personne acceptera très probablement et pourra améliorer l'article, mais l'association risque d'être lue comme un choix stratégique peu flatteur et de vous coûter un peu de crédit.\n\nContinuez si vous voulez le bonus de qualité. Réfléchissez encore si le prestige compte davantage cette année.`
-      : `Dear ${state.player.name},\n\nThis collaborator looks substantially less established than you. They are very likely to accept and can still improve the paper, but the association may be read as strategically uneven and cost you reputation.\n\nProceed if you want the quality boost. Reconsider if prestige matters more this year.`,
+    body: `Dear ${state.player.name},\n\nThis collaborator looks substantially less established than you. They are very likely to accept and can still improve the paper, but the association may be read as strategically uneven and cost you reputation.\n\nProceed if you want the quality boost. Reconsider if prestige matters more this year.`,
     onContinue: () => contactCollaborationCandidate(colleague),
     secondary: {
       label: "Reconsider",
@@ -1924,7 +1441,6 @@ function shell(content) {
           </div>
         </div>
         <button id="menuButton" class="sidebar-action">${buttonContent("menu", "Menu")}</button>
-        <button id="languageButton" class="sidebar-action">${isFrench() ? "English" : "Français"}</button>
         <button id="feedbackButton" class="sidebar-action">${buttonContent("feedback", "Feedback")}</button>
         ${stats.length ? `<div class="stat-list">
           ${stats.map(([k, v]) => `<div class="stat"><span>${k}</span><strong>${v}</strong></div>`).join("")}
@@ -1953,13 +1469,10 @@ function shell(content) {
     </div>
   `;
 
-  localizeDom(app);
   const cvButton = document.getElementById("seeCv");
   if (cvButton) cvButton.addEventListener("click", showCvModal);
   const menuButton = document.getElementById("menuButton");
   if (menuButton) menuButton.addEventListener("click", showMenuPanel);
-  const languageButton = document.getElementById("languageButton");
-  if (languageButton) languageButton.addEventListener("click", () => setLanguage(isFrench() ? "en" : "fr"));
   const feedbackButton = document.getElementById("feedbackButton");
   if (feedbackButton) feedbackButton.addEventListener("click", showFeedbackModal);
 }
@@ -1982,11 +1495,11 @@ function renderProfile() {
         </div>
         <div class="form-field">
           <label>Institution</label>
-          <input id="institution" value="${rand(displayInstitutionPool())}" />
+          <input id="institution" value="${rand(INSTITUTIONS)}" />
         </div>
         <div class="form-field">
           <label>Domain</label>
-          <select id="domain">${domainOptions.map((d) => `<option value="${d}">${d}</option>`).join("")}</select>
+          <select id="domain">${domainOptions.map((d) => `<option>${d}</option>`).join("")}</select>
         </div>
         <div class="form-field">
           <label>Subdomain</label>
@@ -2004,8 +1517,7 @@ function renderProfile() {
   const domain = document.getElementById("domain");
   const subdomain = document.getElementById("subdomain");
   const syncSubdomains = () => {
-    subdomain.innerHTML = DOMAINS[domain.value].map((d) => `<option value="${d}">${d}</option>`).join("");
-    localizeDom(subdomain);
+    subdomain.innerHTML = DOMAINS[domain.value].map((d) => `<option>${d}</option>`).join("");
   };
   domain.addEventListener("change", syncSubdomains);
   syncSubdomains();
@@ -2013,7 +1525,7 @@ function renderProfile() {
     document.getElementById("name").value = rand(ACADEMIC_NAMES);
   });
   document.getElementById("randomInstitution").addEventListener("click", () => {
-    document.getElementById("institution").value = rand(displayInstitutionPool());
+    document.getElementById("institution").value = rand(INSTITUTIONS);
   });
   document.getElementById("startCareer").addEventListener("click", () => {
     state.player = {
@@ -2028,7 +1540,7 @@ function renderProfile() {
     state.collaborationCandidates = generateColleagues(false);
     startYearSummary();
     state.phase = "Welcome";
-    log(tx(`${state.player.name} begins at ${state.player.institution}.`, `${state.player.name} prend ses fonctions à ${state.player.institution}.`), "good");
+    log(`${state.player.name} begins at ${state.player.institution}.`, "good");
     renderCareerWelcome();
   });
 }
@@ -2163,7 +1675,6 @@ function renderPromotionOffer(promotion) {
 function applyForPromotion() {
   const promotion = state.pendingPromotion;
   const accepted = Math.random() < promotionChance(promotion);
-  const rankName = localizeText(promotion.rank);
   if (accepted) {
     state.player.rank = promotion.rank;
     if (promotion.rank === "Full Professor") state.player.name = promoteDisplayName(state.player.name);
@@ -2171,18 +1682,14 @@ function applyForPromotion() {
     showEmailModal({
       from: "Faculty Promotions Committee <appointments@university.example>",
       subject: "Outcome of your promotion application",
-      body: isFrench()
-        ? `Chère/Cher ${state.player.name},\n\nLa commission a le plaisir de vous informer que votre demande de promotion au rang de ${rankName} a reçu un avis favorable.\n\nVotre dossier scientifique, votre visibilité extérieure et votre capacité manifeste à faire exister autour de vous une activité de recherche plus vaste ont été appréciés. La promotion prend effet immédiatement.\n\nBien cordialement,\nLa commission des carrières`
-        : `Dear ${state.player.name},\n\nThe committee is pleased to inform you that your application for promotion to ${promotion.rank} has been successful.\n\nYour scholarly record, external visibility, and evident capacity to support a larger research group were viewed favorably. The promotion takes effect immediately.\n\nSincerely,\nThe Faculty Promotions Committee`,
+      body: `Dear ${state.player.name},\n\nThe committee is pleased to inform you that your application for promotion to ${promotion.rank} has been successful.\n\nYour scholarly record, external visibility, and evident capacity to support a larger research group were viewed favorably. The promotion takes effect immediately.\n\nSincerely,\nThe Faculty Promotions Committee`,
       onContinue: renderFunding,
     });
   } else {
     showEmailModal({
       from: "Faculty Promotions Committee <appointments@university.example>",
       subject: "Outcome of your promotion application",
-      body: isFrench()
-        ? `Chère/Cher ${state.player.name},\n\nLa commission a examiné votre demande de promotion au rang de ${rankName}. Après délibération, nous avons le regret de vous informer que le dossier n'a pas été retenu cette année.\n\nLa commission vous invite à consolider votre trajectoire par de nouvelles publications, des financements obtenus et des signes plus explicites de reconnaissance extérieure avant une prochaine candidature.\n\nBien cordialement,\nLa commission des carrières`
-        : `Dear ${state.player.name},\n\nThe committee has reviewed your application for promotion to ${promotion.rank}. After careful deliberation, we regret to inform you that the application was not successful this year.\n\nThe committee encourages you to strengthen the dossier through further publications, grants, and external recognition before reapplying.\n\nSincerely,\nThe Faculty Promotions Committee`,
+      body: `Dear ${state.player.name},\n\nThe committee has reviewed your application for promotion to ${promotion.rank}. After careful deliberation, we regret to inform you that the application was not successful this year.\n\nThe committee encourages you to strengthen the dossier through further publications, grants, and external recognition before reapplying.\n\nSincerely,\nThe Faculty Promotions Committee`,
       onContinue: renderFunding,
     });
   }
@@ -2462,9 +1969,7 @@ function showLowAimWarning(fit, onContinue) {
   showEmailModal({
     from: "Your Inner Career Strategist <do-not-ignore@self.example>",
     subject: "Are you sure about this journal choice?",
-    body: isFrench()
-      ? `Chère/Cher ${state.player.name},\n\nCette revue semble nettement en dessous du niveau de l'article. Elle acceptera probablement le manuscrit, mais le bénéfice professionnel restera très faible : peu de visibilité, peu d'expérience, peu de citations.\n\nSi vous voulez une ligne discrète sur le CV, continuez. Si vous voulez que l'article compte vraiment, il faudrait peut-être viser plus haut.\n\nAppréciation actuelle : ${localizeText(fit.label)}.`
-      : `Dear ${state.player.name},\n\nThis journal looks substantially below the level of the paper. It is likely to accept the manuscript, but the professional payoff will be very small: little reputation, little experience, and few citations.\n\nIf you want a quiet line on the CV, proceed. If you want the paper to matter, consider aiming higher.\n\nCurrent assessment: ${fit.label}.`,
+    body: `Dear ${state.player.name},\n\nThis journal looks substantially below the level of the paper. It is likely to accept the manuscript, but the professional payoff will be very small: little reputation, little experience, and few citations.\n\nIf you want a quiet line on the CV, proceed. If you want the paper to matter, consider aiming higher.\n\nCurrent assessment: ${fit.label}.`,
     onContinue,
     secondary: {
       label: "Choose another journal",
@@ -2486,37 +1991,12 @@ function showJournalInfo(journal) {
     </section>
   `;
   app.appendChild(overlay);
-  localizeDom(overlay);
   document.getElementById("closeJournalInfo").addEventListener("click", () => overlay.remove());
 }
 
 function journalEmail(result, final = false) {
   const greeting = `Dear ${state.player.name},`;
   const paper = `Manuscript: "${state.currentPaper.title}"`;
-  if (isFrench()) {
-    const frenchGreeting = `Chère/Cher ${state.player.name},`;
-    const frenchPaper = `Manuscrit : « ${state.currentPaper.title} »`;
-    const journalName = state.selectedJournal.name;
-    if (result === "revision") {
-      return oneOf([
-        `${frenchGreeting}\n\nNous vous remercions d'avoir soumis votre manuscrit à ${journalName}.\n\n${frenchPaper}\n\nAprès consultation des rapporteurs, j'ai le plaisir de vous informer que le texte demeure en cours d'examen. Des révisions substantielles sont toutefois nécessaires avant qu'une décision finale puisse être prise. Merci de répondre avec précision aux remarques et de soumettre une version révisée.\n\nBien cordialement,\nLa rédaction`,
-        `${frenchGreeting}\n\nNous avons reçu les rapports concernant votre soumission à ${journalName}.\n\n${frenchPaper}\n\nLes rapporteurs voient une promesse réelle dans le manuscrit, mais demandent également des clarifications, des analyses complémentaires et une justification plus ferme de la raison d'être de l'article. Nous vous invitons donc à soumettre une version révisée.\n\nCordialement,\nLe rédacteur en charge`,
-        `${frenchGreeting}\n\nVotre manuscrit a terminé son premier tour d'évaluation à ${journalName}.\n\n${frenchPaper}\n\nLa décision est : révisions majeures. L'article n'est pas encore publiable en l'état, mais les rapports suggèrent qu'une réponse soigneuse pourrait le faire entrer dans la zone acceptable.\n\nBien à vous,\nLe secrétariat de rédaction`,
-      ]);
-    }
-    if (result === "accepted") {
-      return oneOf([
-        `${frenchGreeting}\n\nJ'ai le plaisir de vous informer que votre manuscrit ${final ? "révisé " : ""}est accepté pour publication dans ${journalName}.\n\n${frenchPaper}\n\nLes rapporteurs ont jugé la contribution convaincante, et la rédaction se réjouit de voir ce travail rejoindre la littérature scientifique.\n\nBien cordialement,\nLa rédaction`,
-        `${frenchGreeting}\n\nNous sommes heureux d'accepter votre soumission ${final ? "révisée " : ""}à ${journalName}.\n\n${frenchPaper}\n\nLe manuscrit est devenu une contribution claire et publiable. Vous recevrez prochainement les épreuves, les questions de production et les formulaires habituels qui rappellent que la victoire administrative n'est jamais complète.\n\nBien à vous,\nLe rédacteur en charge`,
-        `${frenchGreeting}\n\nFélicitations. Votre manuscrit ${final ? "révisé " : ""}a été accepté par ${journalName}.\n\n${frenchPaper}\n\nL'équipe éditoriale estime que l'article intéressera nos lecteurs et retiendra l'attention des spécialistes du domaine.\n\nCordialement,\nLa rédaction`,
-      ]);
-    }
-    return oneOf([
-      `${frenchGreeting}\n\nNous vous remercions d'avoir soumis votre manuscrit ${final ? "révisé " : ""}à ${journalName}.\n\n${frenchPaper}\n\nAprès examen attentif, nous avons le regret de vous informer que nous ne pouvons pas accepter le manuscrit pour publication. Les rapporteurs soulèvent des réserves qui ne semblent pas pouvoir être levées dans le cadre de cette soumission.\n\nBien cordialement,\nLa rédaction`,
-      `${frenchGreeting}\n\nL'évaluation de votre manuscrit ${final ? "révisé " : ""}à ${journalName} est maintenant terminée.\n\n${frenchPaper}\n\nMalheureusement, les rapports ne soutiennent pas une publication. Les rapporteurs ne sont pas convaincus que la contribution soit suffisamment robuste pour la revue.\n\nCordialement,\nLe secrétariat de rédaction`,
-      `${frenchGreeting}\n\nMerci d'avoir donné à ${journalName} l'occasion d'examiner votre travail.\n\n${frenchPaper}\n\nJe suis au regret de vous informer que nous devons refuser le manuscrit. La décision n'a pas été prise à la légère, même si l'un des rapports était inhabituellement catégorique.\n\nBien cordialement,\nLa rédaction`,
-    ]);
-  }
   if (result === "revision") {
     return oneOf([
       `${greeting}\n\nThank you for submitting your manuscript to ${state.selectedJournal.name}.\n\n${paper}\n\nAfter consultation with the reviewers, I am pleased to report that the manuscript remains under active consideration. However, substantial revisions are required before a final decision can be made. Please address the reviewers' concerns carefully and submit a revised version.\n\nSincerely,\nThe Editor`,
